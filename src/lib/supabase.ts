@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 
 
 // Initialize database client
-const supabaseUrl = 'https://csdwcjbfexwtaqpmzzkj.databasepad.com';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhmNzFmNzlhLWZkMjAtNDYyNy1hMzVmLTExZTc5NjhlY2QwYSJ9.eyJwcm9qZWN0SWQiOiJjc2R3Y2piZmV4d3RhcXBtenpraiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzcxNTEwODE0LCJleHAiOjIwODY4NzA4MTQsImlzcyI6ImZhbW91cy5kYXRhYmFzZXBhZCIsImF1ZCI6ImZhbW91cy5jbGllbnRzIn0.7PlmeZjxGTplqF0juXTQ_9vJcleqkcSL6_D3fGm0WIg';
+const supabaseUrl = 'https://gufmfkkdqgjomuitbgtt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1Zm1ma2tkcWdqb211aXRiZ3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODU1ODksImV4cCI6MjA5MDY2MTU4OX0.zDSmO1TlrJtwPnM2Peivprubq0HgGhrnJCGIGs_6Nv8';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
