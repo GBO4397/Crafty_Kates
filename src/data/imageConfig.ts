@@ -20,7 +20,7 @@ export const ABOUT = {
 
 // ----- EVENTS SECTION -----
 export const EVENTS = {
-  carShow: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-13.jpeg',
+  carShow: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-13.jpg',
 };
 
 // ----- MOTTO SECTION -----
