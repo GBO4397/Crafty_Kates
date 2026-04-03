@@ -30,8 +30,8 @@ export const MOTTO = {
 
 // ----- COMMUNITY SECTION -----
 export const COMMUNITY = {
-  animalShelter: '/images/site/ridgecrest-animal-shelter.jpeg',
-  almostEden: '/images/site/almost-eden-rescue.jpeg',
+  animalShelter: '/images/site/ridgecrest-animal-shelter.jpg',
+  almostEden: '/images/site/almost-eden-rescue.jpg',
 };
 
 // ----- CAR SHOW PAGE -----
