@@ -11,7 +11,6 @@ import CarShowPage from "./pages/CarShowPage";
 import CarShowRegistration from "./pages/CarShowRegistration";
 import OrganizerChecklist from "./pages/OrganizerChecklist";
 import SponsorAdmin from "./pages/SponsorAdmin";
-import ImageAdmin from "./pages/ImageAdmin";
 import EventAdmin from "./pages/EventAdmin";
 import GalleryBenRadatz from "./pages/GalleryBenRadatz";
 import GalleryWallin from "./pages/GalleryWallin";
@@ -36,7 +35,6 @@ const App = () => (
             <Route path="/register" element={<CarShowRegistration />} />
             <Route path="/checklist" element={<OrganizerChecklist />} />
             <Route path="/sponsor-admin" element={<SponsorAdmin />} />
-            <Route path="/image-admin" element={<ImageAdmin />} />
             <Route path="/event-admin" element={<EventAdmin />} />
             <Route path="/gallery/ben-radatz" element={<GalleryBenRadatz />} />
             <Route path="/gallery/k-mikael-wallin" element={<GalleryWallin />} />

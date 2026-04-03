@@ -2,7 +2,6 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Lock, LogOut, Eye, EyeOff, AlertCircle, Loader2, ChevronLeft,
-  Image as ImageIcon, Shield, Calendar, ClipboardList, Download,
   LayoutDashboard, ChevronRight, Menu, X, Ticket, UserCheck
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -10,14 +9,13 @@ import { checkAdminAuth, adminLogout, ADMIN_PASSWORD, generateAdminToken } from 
 
 // Lazy load admin page content components
 const SponsorAdmin = lazy(() => import('./SponsorAdmin'));
-const ImageAdmin = lazy(() => import('./ImageAdmin'));
 const EventAdmin = lazy(() => import('./EventAdmin'));
 const DownloadImages = lazy(() => import('./DownloadImages'));
 const OrganizerChecklist = lazy(() => import('./OrganizerChecklist'));
 const RegistrationAdmin = lazy(() => import('./RegistrationAdmin'));
 const CheckInAdmin = lazy(() => import('./CheckInAdmin'));
 
-type AdminTool = 'images' | 'sponsors' | 'events' | 'registrations' | 'checkin' | 'checklist' | 'downloads';
+type AdminTool = 'sponsors' | 'events' | 'registrations' | 'checkin' | 'checklist' | 'downloads';
 
 
 
@@ -33,13 +31,6 @@ interface ToolConfig {
 
 const TOOLS: ToolConfig[] = [
   {
-    id: 'images',
-    label: 'Image Manager',
-    shortLabel: 'Images',
-    description: 'Upload & manage site images',
-    icon: ImageIcon,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
   },
   {
     id: 'sponsors',
@@ -422,7 +413,6 @@ const AdminDashboard: React.FC = () => {
 
         <Suspense fallback={<LoadingFallback />}>
           <div className="min-h-screen">
-            {activeTool === 'images' && <ImageAdmin embedded />}
             {activeTool === 'sponsors' && <SponsorAdmin embedded />}
             {activeTool === 'events' && <EventAdmin embedded />}
             {activeTool === 'registrations' && <RegistrationAdmin embedded />}
