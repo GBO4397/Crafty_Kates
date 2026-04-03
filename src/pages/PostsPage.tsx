@@ -28,7 +28,7 @@ const ALL_POSTS: Post[] = [
     author: 'Katherine Piroska-Savoie',
     date: 'December 21, 2025',
     category: 'Feature Story',
-    image: 'https://craftykates.com/wp-content/uploads/2025/12/Rodney5.jpg',
+    image: '/images/site/Rodney5.jpg',
     summary: 'For Rodney Potter, drag racing has never been just about speed. It\'s about the connection between man and machine—the mechanics, the physics, the skill, and the quiet intrigue of making something work better than it ever should.',
     content: [
       'For Rodney Potter, drag racing has never been just about speed. It\'s about the connection between man and machine—the mechanics, the physics, the skill, and the quiet intrigue of making something work better than it ever should. From an early age, Rodney was drawn to how things functioned, how power met pavement, and how mastery came not only from horsepower, but from understanding the tree, the clock, and the moment.',
