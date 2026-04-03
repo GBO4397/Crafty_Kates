@@ -30,8 +30,8 @@ export const MOTTO = {
 
 // ----- COMMUNITY SECTION -----
 export const COMMUNITY = {
-  animalShelter: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-6.jpeg',
-  almostEden: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-5.jpeg',
+  animalShelter: '/images/site/ridgecrest-animal-shelter.jpeg',
+  almostEden: '/images/site/almost-eden-rescue.jpeg',
 };
 
 // ----- CAR SHOW PAGE -----
@@ -51,7 +51,6 @@ export const SPONSORS = {
 // ----- GALLERY PREVIEW (main page) -----
 export const GALLERY_PREVIEW = [
   '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-14.jpeg',
-  '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-6.jpeg',
   '/images/gallery/wallin/IMG_9804.jpeg',
   '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-9.jpeg',
   '/images/gallery/wallin/IMG_9800.jpeg',
