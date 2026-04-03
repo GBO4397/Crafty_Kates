@@ -2,6 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Lock, LogOut, Eye, EyeOff, AlertCircle, Loader2, ChevronLeft,
+  Shield, Calendar, ClipboardList, Download,
   LayoutDashboard, ChevronRight, Menu, X, Ticket, UserCheck
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
