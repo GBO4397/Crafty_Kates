@@ -307,8 +307,7 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const tierDimensions = { gold: { width: 400, height: 300 }, silver: { width: 350, height: 250 }, bronze: { width: 300, height: 200 } };
-  const dims = tierDimensions[tier as keyof typeof tierDimensions] || tierDimensions.bronze;
+  const dims = { width: 300, height: 300 };
 
   return (
     <>
@@ -392,7 +391,6 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sponsor Type</label>
                   <div className="grid grid-cols-3 gap-2">
-                    <>
                     {[
                       { value: 'primary', label: 'Primary Sponsor', cls: 'border-[#9E065D] bg-[#FEE6F4] text-[#9E065D]' },
                       { value: 'carshow', label: 'Car Show Sponsor', cls: 'border-blue-400 bg-blue-50 text-blue-700' },
