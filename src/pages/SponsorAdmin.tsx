@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import {
   ChevronLeft, RefreshCw, Shield, LayoutDashboard,
   Save, CheckCircle, AlertCircle, Loader2, ExternalLink,
-  Plus, X, Crown, Trophy, Medal, Lock, LogOut, Eye, EyeOff,
+  Plus, X, Lock, LogOut, Eye, EyeOff,
   LayoutGrid, Table2, Camera, Info, Globe, Facebook, Instagram, Youtube
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -12,7 +12,6 @@ import SponsorAdminStats from '@/components/admin/SponsorAdminStats';
 import SponsorAdminTable from '@/components/admin/SponsorAdminTable';
 import SponsorAdminCards from '@/components/admin/SponsorAdminCards';
 
-// Custom TikTok icon
 const TikTokIcon: React.FC<{ size?: number; className?: string }> = ({ size = 14, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
@@ -23,6 +22,7 @@ interface Sponsor {
   id: string;
   name: string;
   tier: string;
+  sponsor_type: 'primary' | 'carshow' | 'both';
   logo_url: string | null;
   website_url: string | null;
   description: string | null;
@@ -36,12 +36,8 @@ interface Sponsor {
   updated_at: string;
 }
 
-// Known core columns that definitely exist in the database
-const CORE_FIELDS = ['name', 'tier', 'logo_url', 'website_url', 'description', 'sort_order', 'is_active', 'updated_at'];
-// Social media columns
 const SOCIAL_FIELDS = ['facebook_url', 'instagram_url', 'youtube_url', 'tiktok_url'];
 
-// Helper: strip social media fields from an object
 function stripSocialFields(obj: Record<string, any>): Record<string, any> {
   const result: Record<string, any> = {};
   for (const key of Object.keys(obj)) {
@@ -52,12 +48,12 @@ function stripSocialFields(obj: Record<string, any>): Record<string, any> {
   return result;
 }
 
-// Helper: normalize sponsor data from DB (fill in missing social fields with null)
 function normalizeSponsor(data: any): Sponsor {
   return {
     id: data.id,
     name: data.name || '',
     tier: data.tier || 'bronze',
+    sponsor_type: data.sponsor_type || 'carshow',
     logo_url: data.logo_url || null,
     website_url: data.website_url || null,
     description: data.description || null,
@@ -72,14 +68,12 @@ function normalizeSponsor(data: any): Sponsor {
   };
 }
 
-// ─── Shared Admin Password (same as Image Admin) ────────────────
 const ADMIN_PASSWORD = 'CraftyKates2026!';
 
 function generateToken(): string {
   return btoa(Date.now().toString(36) + Math.random().toString(36).slice(2));
 }
 
-// ─── Admin Login Gate ────────────────────────────────────────────
 const AdminLoginGate: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -91,63 +85,43 @@ const AdminLoginGate: React.FC<{ onAuthenticated: () => void }> = ({ onAuthentic
     if (!password.trim()) { setError('Please enter the admin password'); return; }
     setLoading(true);
     setError('');
-
     try {
-      // Try edge function first (if deployed)
       const { data, error: fnError } = await supabase.functions.invoke('verify-admin', {
         body: { password, action: 'login' },
       });
-
       if (!fnError && data?.success) {
         localStorage.setItem('ck_admin_token', data.token);
         localStorage.setItem('ck_admin_expires', data.expiresAt);
         onAuthenticated();
         return;
       }
-    } catch (_) {
-      // Edge function not available — fall through to client-side check
-    }
-
-    // Client-side password check (fallback)
+    } catch (_) {}
     if (password === ADMIN_PASSWORD) {
       const token = generateToken();
-      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       localStorage.setItem('ck_admin_token', token);
       localStorage.setItem('ck_admin_expires', expires);
       onAuthenticated();
     } else {
       setError('Invalid password. Please try again.');
     }
-
     setLoading(false);
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0a12] via-[#2d0f1f] to-[#1a0a12] flex items-center justify-center p-4">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#9E065D]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FB50B1]/8 rounded-full blur-3xl" />
-      </div>
-
       <div className="relative w-full max-w-md">
-        <Link
-          to="/car-show"
-          className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 text-sm mb-8 transition-colors"
-        >
-          <ChevronLeft size={16} />
-          Back to Car Show
+        <Link to="/car-show" className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 text-sm mb-8 transition-colors">
+          <ChevronLeft size={16} /> Back to Car Show
         </Link>
-
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#9E065D] to-[#FB50B1] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#9E065D]/30">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#9E065D] to-[#FB50B1] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Shield size={28} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-1">Sponsor Admin</h1>
             <p className="text-white/40 text-sm">Enter your admin password to continue</p>
           </div>
-
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-white/60 mb-2">Admin Password</label>
@@ -158,55 +132,33 @@ const AdminLoginGate: React.FC<{ onAuthenticated: () => void }> = ({ onAuthentic
                   value={password}
                   onChange={e => { setPassword(e.target.value); setError(''); }}
                   placeholder="Enter password..."
-                  className="w-full pl-11 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[#FB50B1]/40 focus:border-[#FB50B1]/50 transition-all text-sm"
+                  className="w-full pl-11 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[#FB50B1]/40 transition-all text-sm"
                   autoFocus
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
-
             {error && (
               <div className="flex items-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
                 <AlertCircle size={14} className="text-red-400 flex-shrink-0" />
                 <p className="text-red-300 text-sm">{error}</p>
               </div>
             )}
-
-            <button
-              type="submit"
-              disabled={loading || !password.trim()}
-              className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#9E065D] to-[#7D0348] hover:from-[#FB50B1] hover:to-[#9E065D] text-white font-medium rounded-xl transition-all duration-300 shadow-lg shadow-[#9E065D]/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-            >
+            <button type="submit" disabled={loading || !password.trim()} className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#9E065D] to-[#7D0348] text-white font-medium rounded-xl transition-all disabled:opacity-50 text-sm">
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-
-          <p className="text-center text-white/20 text-xs mt-6">
-            Protected area — authorized personnel only
-          </p>
-        </div>
-
-        <div className="text-center mt-6">
-          <Link to="/" className="text-white/30 hover:text-white/50 text-xs transition-colors">
-            Crafty Kates Promotions
-          </Link>
         </div>
       </div>
     </div>
   );
 };
 
-// Track whether social media columns exist in the DB
 let socialColumnsExist: boolean | null = null;
 
-// ─── Main SponsorAdmin Page ──────────────────────────────────────
 const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -218,7 +170,7 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
   const [error, setError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSponsor, setNewSponsor] = useState({
-    name: '', tier: 'bronze', description: '', website_url: '',
+    name: '', sponsor_type: 'carshow', description: '', website_url: '',
     facebook_url: '', instagram_url: '', youtube_url: '', tiktok_url: ''
   });
   const [socialToggles, setSocialToggles] = useState({
@@ -228,18 +180,11 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const { toast } = useToast();
 
-  // Check existing session on mount
   useEffect(() => {
-    if (embedded) {
-      setIsAuthenticated(true);
-      setCheckingAuth(false);
-      return;
-    }
+    if (embedded) { setIsAuthenticated(true); setCheckingAuth(false); return; }
     const token = localStorage.getItem('ck_admin_token');
     const expires = localStorage.getItem('ck_admin_expires');
-    if (token && expires && new Date(expires) > new Date()) {
-      setIsAuthenticated(true);
-    }
+    if (token && expires && new Date(expires) > new Date()) setIsAuthenticated(true);
     setCheckingAuth(false);
   }, [embedded]);
 
@@ -247,34 +192,27 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
     localStorage.removeItem('ck_admin_token');
     localStorage.removeItem('ck_admin_expires');
     setIsAuthenticated(false);
-    supabase.functions.invoke('verify-admin', { body: { action: 'logout' } }).catch(() => {});
   };
 
   const fetchSponsors = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Use select('*') which returns whatever columns exist
       const { data, error: fetchError } = await supabase
         .from('sponsors')
         .select('*')
         .order('sort_order', { ascending: true });
-
       if (fetchError) throw fetchError;
-      
       socialColumnsExist = true;
       setSponsors((data || []).map(normalizeSponsor));
     } catch (err: any) {
-      console.error('Fetch sponsors error:', err);
       setError(err.message || 'Failed to load sponsors');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) fetchSponsors();
-  }, [isAuthenticated, fetchSponsors]);
+  useEffect(() => { if (isAuthenticated) fetchSponsors(); }, [isAuthenticated, fetchSponsors]);
 
   const handleReorder = useCallback((reordered: Sponsor[]) => {
     setSponsors(reordered);
@@ -285,24 +223,15 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
     setSponsors(prev => prev.map(s => s.id === id ? { ...s, ...updates, updated_at: new Date().toISOString() } : s));
     try {
       const dbUpdates: Record<string, any> = { ...updates, updated_at: new Date().toISOString() };
-      // Remove id, created_at from updates
       delete dbUpdates.id;
       delete dbUpdates.created_at;
-
-      // Try with all fields first
       let { error: updateError } = await supabase.from('sponsors').update(dbUpdates).eq('id', id);
-      
-      // If failed, retry without social media fields
       if (updateError) {
-        console.warn('Update with all fields failed, retrying without social fields:', updateError.message);
         const coreUpdates = stripSocialFields(dbUpdates);
         const { error: retryError } = await supabase.from('sponsors').update(coreUpdates).eq('id', id);
         if (retryError) throw retryError;
-        socialColumnsExist = false;
-        toast({ title: 'Updated', description: 'Sponsor updated (note: social media links require database column setup)' });
-      } else {
-        toast({ title: 'Updated', description: 'Sponsor updated successfully' });
       }
+      toast({ title: 'Updated', description: 'Sponsor updated successfully' });
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to update', variant: 'destructive' });
       fetchSponsors();
@@ -313,14 +242,6 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
     const sponsorName = sponsors.find(s => s.id === id)?.name || 'Sponsor';
     setSponsors(prev => prev.filter(s => s.id !== id));
     try {
-      try {
-        const { data: existingFiles } = await supabase.storage.from('sponsor-logos').list(id);
-        if (existingFiles && existingFiles.length > 0) {
-          const toDelete = existingFiles.map(f => `${id}/${f.name}`);
-          await supabase.storage.from('sponsor-logos').remove(toDelete);
-        }
-      } catch (_) {}
-
       const { error: deleteError } = await supabase.from('sponsors').delete().eq('id', id);
       if (deleteError) throw deleteError;
       toast({ title: 'Deleted', description: `${sponsorName} has been removed` });
@@ -343,8 +264,7 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
     setSponsors(prev => prev.map(s => ids.includes(s.id) ? { ...s, ...updates, updated_at: new Date().toISOString() } : s));
     try {
       for (const id of ids) {
-        const { error: updateError } = await supabase.from('sponsors').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
-        if (updateError) throw updateError;
+        await supabase.from('sponsors').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
       }
       toast({ title: 'Bulk Action Complete', description: `${ids.length} sponsor(s) updated` });
     } catch (err: any) {
@@ -357,8 +277,7 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
     setSaving(true);
     try {
       for (const sponsor of sponsors) {
-        const { error: updateError } = await supabase.from('sponsors').update({ sort_order: sponsor.sort_order, updated_at: new Date().toISOString() }).eq('id', sponsor.id);
-        if (updateError) throw updateError;
+        await supabase.from('sponsors').update({ sort_order: sponsor.sort_order, updated_at: new Date().toISOString() }).eq('id', sponsor.id);
       }
       setHasChanges(false);
       setLastSaved(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
@@ -370,25 +289,15 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
     }
   };
 
-  const handleToggleNewSocial = (key: string) => {
-    setSocialToggles(prev => {
-      const newState = { ...prev, [key]: !prev[key] };
-      if (prev[key]) {
-        setNewSponsor(prevS => ({ ...prevS, [key]: '' }));
-      }
-      return newState;
-    });
-  };
-
   const handleAddSponsor = async () => {
     if (!newSponsor.name.trim()) return;
     setAddingNew(true);
     try {
       const maxOrder = sponsors.reduce((max, s) => Math.max(max, s.sort_order), 0);
-      
       const insertData: Record<string, any> = {
         name: newSponsor.name.trim(),
-        tier: newSponsor.tier,
+        sponsor_type: newSponsor.sponsor_type,
+        tier: 'bronze',
         description: newSponsor.description.trim() || null,
         website_url: newSponsor.website_url.trim() || null,
         sort_order: maxOrder + 1,
@@ -398,30 +307,13 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
         youtube_url: socialToggles.youtube_url ? (newSponsor.youtube_url.trim() || null) : null,
         tiktok_url: socialToggles.tiktok_url ? (newSponsor.tiktok_url.trim() || null) : null,
       };
-
-      // Try with all fields first
-      let result;
-      if (socialColumnsExist !== false) {
-        result = await supabase.from('sponsors').insert(insertData).select().single();
-        
-        if (result.error) {
-          console.warn('Insert with social fields failed, retrying without:', result.error.message);
-          socialColumnsExist = false;
-          result = await supabase.from('sponsors').insert(stripSocialFields(insertData)).select().single();
-        } else {
-          socialColumnsExist = true;
-        }
-      } else {
-        result = await supabase.from('sponsors').insert(stripSocialFields(insertData)).select().single();
-      }
-
+      const result = await supabase.from('sponsors').insert(insertData).select().single();
       if (result.error) throw result.error;
-      
       setSponsors(prev => [...prev, normalizeSponsor(result.data)]);
       setShowAddModal(false);
-      setNewSponsor({ name: '', tier: 'bronze', description: '', website_url: '', facebook_url: '', instagram_url: '', youtube_url: '', tiktok_url: '' });
+      setNewSponsor({ name: '', sponsor_type: 'carshow', description: '', website_url: '', facebook_url: '', instagram_url: '', youtube_url: '', tiktok_url: '' });
       setSocialToggles({ facebook_url: false, instagram_url: false, youtube_url: false, tiktok_url: false });
-      toast({ title: 'Sponsor Added', description: `${newSponsor.name} has been added. Click on the sponsor card to upload a logo and edit details.` });
+      toast({ title: 'Sponsor Added', description: `${newSponsor.name} has been added. Click on the card to upload a logo.` });
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to add sponsor', variant: 'destructive' });
     } finally {
@@ -429,32 +321,18 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
     }
   };
 
-  // Social platform config for Add modal
   const addSocialPlatforms = [
     { key: 'facebook_url', label: 'Facebook', icon: Facebook, iconColor: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', toggleActive: 'bg-blue-600', placeholder: 'https://www.facebook.com/yourpage' },
-    { key: 'instagram_url', label: 'Instagram', icon: Instagram, iconColor: 'text-pink-600', bgColor: 'bg-pink-50', borderColor: 'border-pink-200', toggleActive: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', placeholder: 'https://www.instagram.com/yourpage' },
+    { key: 'instagram_url', label: 'Instagram', icon: Instagram, iconColor: 'text-pink-600', bgColor: 'bg-pink-50', borderColor: 'border-pink-200', toggleActive: 'bg-pink-600', placeholder: 'https://www.instagram.com/yourpage' },
     { key: 'youtube_url', label: 'YouTube', icon: Youtube, iconColor: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200', toggleActive: 'bg-red-600', placeholder: 'https://www.youtube.com/@yourchannel' },
     { key: 'tiktok_url', label: 'TikTok', icon: TikTokIcon, iconColor: 'text-gray-900', bgColor: 'bg-gray-50', borderColor: 'border-gray-300', toggleActive: 'bg-gray-900', placeholder: 'https://www.tiktok.com/@yourhandle' },
   ];
 
-  // Show loading while checking auth
-  if (checkingAuth) {
-    return (
-      <div className="min-h-screen bg-[#1a0a12] flex items-center justify-center">
-        <Loader2 size={32} className="text-[#FB50B1] animate-spin" />
-      </div>
-    );
-  }
+  if (checkingAuth) return <div className="min-h-screen bg-[#1a0a12] flex items-center justify-center"><Loader2 size={32} className="text-[#FB50B1] animate-spin" /></div>;
+  if (!isAuthenticated) return <AdminLoginGate onAuthenticated={() => setIsAuthenticated(true)} />;
 
-  // Show login gate if not authenticated
-  if (!isAuthenticated) {
-    return <AdminLoginGate onAuthenticated={() => setIsAuthenticated(true)} />;
-  }
-
-  // Authenticated — show dashboard
   return (
     <div className="min-h-screen bg-gray-50/80 font-sans text-gray-900">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -462,7 +340,6 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
               <Link to="/car-show" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#9E065D] transition-colors">
                 <ChevronLeft size={16} /> Back to Car Show
               </Link>
-              <div className="hidden sm:block w-px h-6 bg-gray-200" />
               <div className="hidden sm:flex items-center gap-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#9E065D] to-[#FB50B1] rounded-lg flex items-center justify-center">
                   <Shield size={16} className="text-white" />
@@ -474,41 +351,27 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              {lastSaved && (
-                <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-emerald-600">
-                  <CheckCircle size={12} /> Saved at {lastSaved}
-                </span>
-              )}
-
-              {/* View Toggle */}
+              {lastSaved && <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-emerald-600"><CheckCircle size={12} /> Saved at {lastSaved}</span>}
               <div className="hidden sm:flex items-center bg-gray-100 rounded-lg p-0.5">
-                <button
-                  onClick={() => setViewMode('cards')}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${viewMode === 'cards' ? 'bg-white text-[#9E065D] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >
+                <button onClick={() => setViewMode('cards')} className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${viewMode === 'cards' ? 'bg-white text-[#9E065D] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
                   <LayoutGrid size={13} /> Cards
                 </button>
-                <button
-                  onClick={() => setViewMode('table')}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${viewMode === 'table' ? 'bg-white text-[#9E065D] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >
+                <button onClick={() => setViewMode('table')} className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${viewMode === 'table' ? 'bg-white text-[#9E065D] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
                   <Table2 size={13} /> Table
                 </button>
               </div>
-
               <button onClick={fetchSponsors} disabled={loading} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-                <span className="hidden sm:inline">Refresh</span>
+                <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /><span className="hidden sm:inline">Refresh</span>
               </button>
               <button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[#9E065D] hover:bg-[#7D0348] rounded-lg transition-colors shadow-sm">
                 <Plus size={14} /> <span className="hidden sm:inline">Add Sponsor</span>
               </button>
               {hasChanges && (
-                <button onClick={handleSaveOrder} disabled={saving} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm animate-pulse hover:animate-none">
+                <button onClick={handleSaveOrder} disabled={saving} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm">
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Save Order
                 </button>
               )}
-              <button onClick={handleLogout} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Sign out">
+              <button onClick={handleLogout} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                 <LogOut size={14} /> <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
@@ -516,16 +379,13 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
         </div>
       </header>
 
-      {/* Page Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <LayoutDashboard size={24} className="text-[#9E065D]" />
             <h2 className="text-2xl font-bold text-gray-900">Sponsor Dashboard</h2>
           </div>
-          <p className="text-gray-500 text-sm ml-9">
-            Manage sponsor information, logos, tiers, and display order. Click on any sponsor card to edit all details including logo, description, website, and social media links.
-          </p>
+          <p className="text-gray-500 text-sm ml-9">Manage sponsor information, logos, and display order. Click any sponsor card to edit details including logo, description, website, and social media links.</p>
         </div>
 
         {error && (
@@ -550,7 +410,6 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
           <div className="space-y-8">
             <SponsorAdminStats sponsors={sponsors} />
 
-            {/* Quick Actions Bar */}
             <div className="flex flex-wrap items-center gap-3">
               <Link to="/car-show" className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-[#FB50B1]/40 hover:text-[#9E065D] transition-all">
                 <ExternalLink size={14} /> View Car Show Page
@@ -560,31 +419,8 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
                   <Camera size={14} /> {sponsors.filter(s => !s.logo_url).length} sponsors need logos — click cards to upload
                 </div>
               )}
-
-              {socialColumnsExist === false && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700">
-                  <Info size={14} /> Social media links saved locally only (DB columns not yet configured)
-                </div>
-              )}
-
-              {/* Mobile view toggle */}
-              <div className="sm:hidden flex items-center bg-gray-100 rounded-lg p-0.5 ml-auto">
-                <button
-                  onClick={() => setViewMode('cards')}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${viewMode === 'cards' ? 'bg-white text-[#9E065D] shadow-sm' : 'text-gray-500'}`}
-                >
-                  <LayoutGrid size={13} /> Cards
-                </button>
-                <button
-                  onClick={() => setViewMode('table')}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${viewMode === 'table' ? 'bg-white text-[#9E065D] shadow-sm' : 'text-gray-500'}`}
-                >
-                  <Table2 size={13} /> Table
-                </button>
-              </div>
             </div>
 
-            {/* Sponsor Cards or Table */}
             <div id="sponsor-content">
               {viewMode === 'cards' ? (
                 <SponsorAdminCards
@@ -604,7 +440,6 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
               )}
             </div>
 
-            {/* Unsaved Changes Bar */}
             {hasChanges && (
               <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
                 <div className="bg-gray-900 text-white rounded-2xl px-6 py-3.5 shadow-2xl flex items-center gap-4">
@@ -623,7 +458,6 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
         )}
       </main>
 
-      {/* Add Sponsor Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
@@ -647,30 +481,30 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sponsor Name <span className="text-red-500">*</span></label>
                 <input type="text" value={newSponsor.name} onChange={e => setNewSponsor(prev => ({ ...prev, name: e.target.value }))} placeholder="e.g. Acme Auto Parts" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9E065D]/20 focus:border-[#9E065D] transition-all" autoFocus />
               </div>
+
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Tier</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sponsor Type</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { value: 'gold', label: 'Gold', icon: Crown, activeCls: 'border-amber-400 bg-amber-50 text-amber-700 shadow-sm' },
-                    { value: 'silver', label: 'Silver', icon: Trophy, activeCls: 'border-slate-400 bg-slate-50 text-slate-700 shadow-sm' },
-                    { value: 'bronze', label: 'Bronze', icon: Medal, activeCls: 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm' },
+                    { value: 'primary', label: 'Primary Sponsor', activeCls: 'border-[#9E065D] bg-[#FEE6F4] text-[#9E065D] shadow-sm' },
+                    { value: 'carshow', label: 'Car Show Sponsor', activeCls: 'border-blue-400 bg-blue-50 text-blue-700 shadow-sm' },
+                    { value: 'both', label: 'Both', activeCls: 'border-purple-400 bg-purple-50 text-purple-700 shadow-sm' },
                   ].map(t => (
-                    <button key={t.value} onClick={() => setNewSponsor(prev => ({ ...prev, tier: t.value }))} className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${newSponsor.tier === t.value ? t.activeCls : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
-                      <t.icon size={16} /> {t.label}
+                    <button key={t.value} onClick={() => setNewSponsor(prev => ({ ...prev, sponsor_type: t.value }))} className={`flex items-center justify-center px-3 py-2.5 rounded-xl border-2 text-xs font-medium transition-all ${newSponsor.sponsor_type === t.value ? t.activeCls : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+                      {t.label}
                     </button>
                   ))}
                 </div>
               </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Description</label>
                 <textarea value={newSponsor.description} onChange={e => setNewSponsor(prev => ({ ...prev, description: e.target.value }))} placeholder="Short description about the sponsor..." rows={2} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#9E065D]/20 focus:border-[#9E065D] transition-all resize-none" />
               </div>
 
-              {/* Website */}
               <div className="border-t border-gray-100 pt-4">
                 <h4 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                  <Globe size={14} className="text-[#9E065D]" />
-                  Website
+                  <Globe size={14} className="text-[#9E065D]" /> Website
                 </h4>
                 <div className="relative">
                   <Globe size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -678,42 +512,23 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
                 </div>
               </div>
 
-              {/* Social Media with Toggles */}
               <div className="border-t border-gray-100 pt-4">
-                <h4 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
-                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="text-[#9E065D]">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                  </svg>
-                  Social Media Links
-                </h4>
+                <h4 className="text-sm font-bold text-gray-800 mb-2">Social Media Links</h4>
                 <p className="text-xs text-gray-500 mb-3">Toggle on the platforms this sponsor uses.</p>
-                
                 <div className="space-y-2.5">
                   {addSocialPlatforms.map(platform => {
                     const isEnabled = socialToggles[platform.key as keyof typeof socialToggles];
                     const PlatformIcon = platform.icon;
-
                     return (
-                      <div
-                        key={platform.key}
-                        className={`rounded-xl border-2 transition-all duration-300 overflow-hidden ${
-                          isEnabled ? `${platform.borderColor} ${platform.bgColor}` : 'border-gray-100 bg-gray-50/50'
-                        }`}
-                      >
-                        <div
-                          className="flex items-center justify-between px-3 py-2.5 cursor-pointer select-none"
-                          onClick={() => handleToggleNewSocial(platform.key)}
-                        >
+                      <div key={platform.key} className={`rounded-xl border-2 transition-all duration-300 overflow-hidden ${isEnabled ? `${platform.borderColor} ${platform.bgColor}` : 'border-gray-100 bg-gray-50/50'}`}>
+                        <div className="flex items-center justify-between px-3 py-2.5 cursor-pointer select-none" onClick={() => setSocialToggles(prev => ({ ...prev, [platform.key]: !prev[platform.key as keyof typeof prev] }))}>
                           <div className="flex items-center gap-2.5">
                             <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${isEnabled ? platform.bgColor : 'bg-gray-100'}`}>
                               <PlatformIcon size={14} className={isEnabled ? platform.iconColor : 'text-gray-400'} />
                             </div>
-                            <span className={`text-sm font-medium ${isEnabled ? 'text-gray-900' : 'text-gray-500'}`}>
-                              {platform.label}
-                            </span>
+                            <span className={`text-sm font-medium ${isEnabled ? 'text-gray-900' : 'text-gray-500'}`}>{platform.label}</span>
                           </div>
-                          <div className={`relative w-10 h-5.5 rounded-full transition-all duration-300 ${isEnabled ? platform.toggleActive : 'bg-gray-300'}`} style={{ width: 40, height: 22 }}>
+                          <div className={`relative rounded-full transition-all duration-300 ${isEnabled ? platform.toggleActive : 'bg-gray-300'}`} style={{ width: 40, height: 22 }}>
                             <div className={`absolute top-0.5 w-[18px] h-[18px] bg-white rounded-full shadow-md transition-all duration-300 ${isEnabled ? 'left-[19px]' : 'left-0.5'}`} />
                           </div>
                         </div>
@@ -721,14 +536,7 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
                           <div className="px-3 pb-2.5">
                             <div className="relative">
                               <PlatformIcon size={12} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${platform.iconColor}`} />
-                              <input
-                                type="url"
-                                value={(newSponsor as any)[platform.key]}
-                                onChange={e => setNewSponsor(prev => ({ ...prev, [platform.key]: e.target.value }))}
-                                placeholder={platform.placeholder}
-                                className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#9E065D]/20 focus:border-[#9E065D] transition-all"
-                                onClick={e => e.stopPropagation()}
-                              />
+                              <input type="url" value={(newSponsor as any)[platform.key]} onChange={e => setNewSponsor(prev => ({ ...prev, [platform.key]: e.target.value }))} placeholder={platform.placeholder} className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#9E065D]/20 focus:border-[#9E065D] transition-all" onClick={e => e.stopPropagation()} />
                             </div>
                           </div>
                         )}
@@ -738,7 +546,6 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
                 </div>
               </div>
 
-              {/* Logo hint */}
               <div className="flex items-start gap-2.5 px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl">
                 <Info size={16} className="text-blue-500 flex-shrink-0 mt-0.5" />
                 <div>
@@ -749,7 +556,7 @@ const SponsorAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) =>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex-shrink-0">
               <button onClick={() => setShowAddModal(false)} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors">Cancel</button>
-              <button onClick={handleAddSponsor} disabled={!newSponsor.name.trim() || addingNew} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#9E065D] to-[#7D0348] hover:from-[#FB50B1] hover:to-[#9E065D] text-white text-sm font-medium rounded-xl transition-all shadow-lg shadow-[#9E065D]/20 disabled:opacity-50 disabled:cursor-not-allowed">
+              <button onClick={handleAddSponsor} disabled={!newSponsor.name.trim() || addingNew} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#9E065D] to-[#7D0348] text-white text-sm font-medium rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
                 {addingNew ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Add Sponsor
               </button>
             </div>
