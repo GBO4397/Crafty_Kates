@@ -294,7 +294,7 @@ interface SponsorSectionProps {
 }
 
 const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
-  const [sponsors, setSponsors] = useState<Sponsor[]>(fallbackSponsors);
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<'all' | 'gold' | 'silver' | 'bronze'>('all');
   const [usingFallback, setUsingFallback] = useState(false);
@@ -313,11 +313,11 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
         setSponsors(data.map(normalizeSponsor));
         setUsingFallback(false);
       } else {
-        setUsingFallback(true);
+  
       }
     } catch (err) {
       console.warn('Using fallback sponsor data:', err);
-      setUsingFallback(true);
+
     } finally {
       setLoading(false);
     }
