@@ -32,8 +32,6 @@ interface ToolConfig {
 
 const TOOLS: ToolConfig[] = [
   {
-  },
-  {
     id: 'sponsors',
     label: 'Sponsor Admin',
     shortLabel: 'Sponsors',
