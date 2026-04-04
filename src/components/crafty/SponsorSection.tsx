@@ -42,13 +42,13 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
 
       {/* Logo */}
       <div className="w-full mb-4 mt-2">
-        <div className="w-full bg-gray-50 rounded-xl overflow-hidden" style={{ paddingBottom: '100%', position: 'relative' }}>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px' }}>
+        <div className="w-full rounded-xl overflow-hidden" style={{ paddingBottom: '100%', position: 'relative' }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {sponsor.logo_url ? (
               <img
                 src={sponsor.logo_url}
                 alt={sponsor.name}
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             ) : (

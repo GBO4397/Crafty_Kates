@@ -29,9 +29,8 @@ function resizeImage(dataUrl: string): Promise<string> {
       const ctx = canvas.getContext('2d');
       if (!ctx) { reject(new Error('Canvas not supported')); return; }
 
-      // Fill white background
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, LOGO_WIDTH, LOGO_HEIGHT);
+      // Use transparent background so round logos display correctly
+      ctx.clearRect(0, 0, LOGO_WIDTH, LOGO_HEIGHT);
 
       // Calculate scale to fit within bounds while maintaining aspect ratio
       const scale = Math.min(LOGO_WIDTH / img.width, LOGO_HEIGHT / img.height);
@@ -41,7 +40,7 @@ function resizeImage(dataUrl: string): Promise<string> {
       const y = (LOGO_HEIGHT - scaledHeight) / 2;
 
       ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-      resolve(canvas.toDataURL('image/jpeg', 0.85));
+      resolve(canvas.toDataURL('image/png'));
     };
     img.onerror = reject;
     img.src = dataUrl;
