@@ -10,7 +10,6 @@ import { checkAdminAuth, adminLogout, ADMIN_PASSWORD, generateAdminToken } from 
 
 // Lazy load admin page content components
 const SponsorAdmin = lazy(() => import('./SponsorAdmin'));
-const EventAdmin = lazy(() => import('./EventAdmin'));
 const DownloadImages = lazy(() => import('./DownloadImages'));
 const OrganizerChecklist = lazy(() => import('./OrganizerChecklist'));
 const RegistrationAdmin = lazy(() => import('./RegistrationAdmin'));
