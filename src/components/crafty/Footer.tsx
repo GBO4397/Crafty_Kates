@@ -1,58 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowUp, ExternalLink, Lock } from 'lucide-react';
-
-import { sponsorDirectory, getSponsorLink } from '@/data/sponsorData';
+import { ArrowUp, Lock } from 'lucide-react';
 import { LOGO } from '@/data/imageConfig';
-
-const FooterSponsorCard: React.FC<{
-  name: string;
-  logo_url: string | null;
-  link: string | null;
-  description?: string;
-}> = ({ name, logo_url, link, description }) => {
-  const [imgError, setImgError] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const hasLogo = logo_url && !imgError;
-
-  useEffect(() => {
-    setImgError(false);
-    setImgLoaded(false);
-  }, [logo_url]);
-
-  const cardContent = (
-    <div className="group relative bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:bg-white/10 hover:border-[#FB50B1]/30 hover:shadow-lg hover:shadow-[#FB50B1]/5">
-      <div className="flex items-center justify-center h-16 sm:h-20 p-2.5">
-        {hasLogo ? (
-          <img
-            src={logo_url!}
-            alt={`${name} logo`}
-            onError={() => setImgError(true)}
-            onLoad={() => setImgLoaded(true)}
-            className={`max-w-full max-h-full object-contain filter brightness-0 invert opacity-50 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110 ${imgLoaded ? '' : 'opacity-0'}`}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center text-center px-1.5">
-            <span className="font-heading text-white/60 group-hover:text-[#FB50B1] text-[10px] sm:text-xs tracking-wider leading-tight transition-colors duration-300">
-              {name.toUpperCase()}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FB50B1] to-[#9E065D] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-    </div>
-  );
-
-  if (link) {
-    return (
-      <a href={link} target="_blank" rel="noopener noreferrer" className="block" title={name}>
-        {cardContent}
-      </a>
-    );
-  }
-
-  return <div title={name}>{cardContent}</div>;
-};
 
 const Footer: React.FC = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -80,10 +29,6 @@ const Footer: React.FC = () => {
       }, 300);
     }
   };
-
-  const heartSponsors = sponsorDirectory.filter(s => s.category === 'heart');
-  const nostalgiaSponsors = sponsorDirectory.filter(s => s.category === 'nostalgia');
-  const allSponsors = sponsorDirectory.filter(s => s.category === 'sponsor' || s.tier === 'gold' || s.tier === 'silver');
 
   const siteLinks = [
     { label: 'Home', to: '/' },
@@ -139,34 +84,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-            <div>
-              <h4 className="font-heading text-lg text-white tracking-wide mb-5">DEAR TO MY HEART</h4>
-              <div className="grid grid-cols-2 gap-2.5">
-                {heartSponsors.map((sponsor, i) => (
-                  <FooterSponsorCard key={i} name={sponsor.name} logo_url={sponsor.logo_url} link={getSponsorLink(sponsor)} description={sponsor.description} />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-heading text-lg text-white tracking-wide mb-5">TRUE NOSTALGIA</h4>
-              <div className="grid grid-cols-2 gap-2.5">
-                {nostalgiaSponsors.map((sponsor, i) => (
-                  <FooterSponsorCard key={i} name={sponsor.name} logo_url={sponsor.logo_url} link={getSponsorLink(sponsor)} description={sponsor.description} />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-heading text-lg text-white tracking-wide mb-5">MY SPONSORS</h4>
-              <div className="grid grid-cols-2 gap-2.5">
-                {allSponsors.map((sponsor, i) => (
-                  <FooterSponsorCard key={i} name={sponsor.name} logo_url={sponsor.logo_url} link={getSponsorLink(sponsor)} description={sponsor.description} />
-                ))}
-              </div>
-            </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div>
               <h4 className="font-heading text-lg text-white tracking-wide mb-5">SITE MENU</h4>
               <ul className="space-y-2.5">
@@ -180,7 +98,6 @@ const Footer: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              {/* Admin Links */}
               <div className="mt-5 pt-4 border-t border-white/10">
                 <p className="text-white/30 text-xs font-semibold uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                   <Lock size={10} />
@@ -193,16 +110,16 @@ const Footer: React.FC = () => {
                 </ul>
               </div>
             </div>
-          </div>
 
-          <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center gap-4">
-            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img src={LOGO} alt="Crafty Kates Logo" className="w-14 h-14 rounded-full" />
-              <div>
-                <p className="text-white/60 text-sm font-medium">Crafty Kate Promotions</p>
-                <p className="text-white/30 text-xs italic">"Drive into the past, fuel the future."</p>
-              </div>
-            </Link>
+            <div className="flex items-start justify-end">
+              <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <img src={LOGO} alt="Crafty Kates Logo" className="w-14 h-14 rounded-full" />
+                <div>
+                  <p className="text-white/60 text-sm font-medium">Crafty Kate Promotions</p>
+                  <p className="text-white/30 text-xs italic">"Drive into the past, fuel the future."</p>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -221,7 +138,7 @@ const Footer: React.FC = () => {
       </div>
 
       {showScrollTop && (
-        <button onClick={scrollToTop} className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-gradient-to-br from-[#9E065D] to-[#FB50B1] text-white rounded-full shadow-lg shadow-[#9E065D]/30 flex items-center justify-center hover:scale-110 transition-transform duration-300 animate-fade-in" title="Back to top">
+        <button onClick={scrollToTop} className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-gradient-to-br from-[#9E065D] to-[#FB50B1] text-white rounded-full shadow-lg shadow-[#9E065D]/30 flex items-center justify-center hover:scale-110 transition-transform duration-300" title="Back to top">
           <ArrowUp size={20} />
         </button>
       )}
