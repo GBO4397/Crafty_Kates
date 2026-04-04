@@ -41,21 +41,25 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
       )}
 
       {/* Logo */}
-      <div className="w-full aspect-square flex items-center justify-center mb-4 mt-2 bg-gray-50 rounded-xl overflow-hidden p-3">
-        {sponsor.logo_url ? (
-          <img
-            src={sponsor.logo_url}
-            alt={sponsor.name}
-            className="w-full h-full object-contain"
-            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
-        ) : (
-          <div className={`w-full h-full rounded-xl flex items-center justify-center ${isPrimary ? 'bg-[#FEE6F4]' : 'bg-gray-100'}`}>
-            <span className={`text-xs font-bold text-center px-2 leading-tight ${isPrimary ? 'text-[#9E065D]' : 'text-gray-400'}`}>
-              {sponsor.name}
-            </span>
+      <div className="w-full mb-4 mt-2">
+        <div className="w-full bg-gray-50 rounded-xl overflow-hidden" style={{ paddingBottom: '100%', position: 'relative' }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px' }}>
+            {sponsor.logo_url ? (
+              <img
+                src={sponsor.logo_url}
+                alt={sponsor.name}
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            ) : (
+              <div className={`w-full h-full rounded-xl flex items-center justify-center ${isPrimary ? 'bg-[#FEE6F4]' : 'bg-gray-100'}`}>
+                <span className={`text-xs font-bold text-center px-2 leading-tight ${isPrimary ? 'text-[#9E065D]' : 'text-gray-400'}`}>
+                  {sponsor.name}
+                </span>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Name & Description */}
@@ -166,6 +170,15 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
               {primarySponsors.map(sponsor => (
                 <SponsorCard key={`primary-${sponsor.id}`} sponsor={sponsor} isPrimary={true} />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Divider between sections */}
+        {primarySponsors.length > 0 && carShowSponsors.length > 0 && (
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-[#FB50B1]/30 to-transparent" />
             </div>
           </div>
         )}
