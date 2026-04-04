@@ -16,7 +16,7 @@ type UploadStatus = 'idle' | 'selected' | 'uploading' | 'success' | 'error';
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const LOGO_WIDTH = 300;
-const LOGO_HEIGHT = 200;
+const LOGO_HEIGHT = 300;
 
 // Resize image to standard size using canvas
 function resizeImage(dataUrl: string): Promise<string> {

@@ -41,12 +41,12 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
       )}
 
       {/* Logo */}
-      <div className="w-full h-24 flex items-center justify-center mb-4 mt-2 bg-gray-50 rounded-xl overflow-hidden">
+      <div className="w-full aspect-square flex items-center justify-center mb-4 mt-2 bg-gray-50 rounded-xl overflow-hidden p-3">
         {sponsor.logo_url ? (
           <img
             src={sponsor.logo_url}
             alt={sponsor.name}
-            className="w-full h-full object-contain p-3"
+            className="w-full h-full object-contain"
             onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         ) : (
@@ -154,9 +154,13 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
         {/* Primary Sponsors */}
         {primarySponsors.length > 0 && (
           <div className="mb-14">
-            <div className="text-center mb-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Primary Sponsors</h3>
-              <p className="text-sm text-gray-500">Supporting Crafty Kates Promotions</p>
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="h-px bg-gradient-to-r from-transparent to-[#FB50B1]/50 flex-1" />
+              <div className="text-center px-6 py-3 bg-gradient-to-r from-[#9E065D] to-[#FB50B1] rounded-2xl shadow-lg shadow-[#9E065D]/20">
+                <h3 className="text-lg font-bold text-white">Primary Sponsors</h3>
+                <p className="text-xs text-white/70">Supporting Crafty Kates Promotions</p>
+              </div>
+              <div className="h-px bg-gradient-to-l from-transparent to-[#FB50B1]/50 flex-1" />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
               {primarySponsors.map(sponsor => (
@@ -169,9 +173,13 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
         {/* Car Show Sponsors */}
         {carShowSponsors.length > 0 && (
           <div className="mb-14">
-            <div className="text-center mb-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Classic Burger Car Show Sponsors</h3>
-              <p className="text-sm text-gray-500">Supporting the Annual Car Show</p>
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="h-px bg-gradient-to-r from-transparent to-gray-300 flex-1" />
+              <div className="text-center px-6 py-3 bg-white border-2 border-gray-200 rounded-2xl shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900">Classic Burger Car Show Sponsors</h3>
+                <p className="text-xs text-gray-500">Supporting the Annual Car Show</p>
+              </div>
+              <div className="h-px bg-gradient-to-l from-transparent to-gray-300 flex-1" />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
               {carShowSponsors.map(sponsor => (

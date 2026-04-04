@@ -121,6 +121,7 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
   const [description, setDescription] = useState(sponsor.description || '');
   const [websiteUrl, setWebsiteUrl] = useState(sponsor.website_url || '');
   const [tier, setTier] = useState(sponsor.tier);
+  const [sponsorType, setSponsorType] = useState((sponsor as any).sponsor_type || 'carshow');
   const [isActive, setIsActive] = useState(sponsor.is_active);
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -183,7 +184,7 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
       name.trim() !== sponsor.name ||
       (description.trim() || null) !== (sponsor.description || null) ||
       (websiteUrl.trim() || null) !== (sponsor.website_url || null) ||
-      tier !== sponsor.tier ||
+      tier !== sponsor.tier || sponsorType !== ((sponsor as any).sponsor_type || 'carshow') ||
       isActive !== sponsor.is_active ||
       socialChanged
     );
@@ -198,6 +199,7 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
     if ((description.trim() || null) !== (sponsor.description || null)) updates.description = description.trim() || null;
     if ((websiteUrl.trim() || null) !== (sponsor.website_url || null)) updates.website_url = websiteUrl.trim() || null;
     if (tier !== sponsor.tier) updates.tier = tier;
+    if (sponsorType !== ((sponsor as any).sponsor_type || 'carshow')) (updates as any).sponsor_type = sponsorType;
     if (isActive !== sponsor.is_active) updates.is_active = isActive;
 
     // Social media - save URL if enabled, null if disabled
@@ -388,15 +390,20 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
 
                 {/* Tier */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sponsorship Tier</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sponsor Type</label>
                   <div className="grid grid-cols-3 gap-2">
-                    {tierOptions.map(t => (
+                    <>
+                    {[
+                      { value: 'primary', label: 'Primary Sponsor', cls: 'border-[#9E065D] bg-[#FEE6F4] text-[#9E065D]' },
+                      { value: 'carshow', label: 'Car Show Sponsor', cls: 'border-blue-400 bg-blue-50 text-blue-700' },
+                      { value: 'both', label: 'Both', cls: 'border-purple-400 bg-purple-50 text-purple-700' },
+                    ].map(t => (
                       <button
                         key={t.value}
-                        onClick={() => setTier(t.value)}
-                        className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${tier === t.value ? t.cls + ' shadow-sm' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                        onClick={() => setSponsorType(t.value)}
+                        className={`flex items-center justify-center px-3 py-2.5 rounded-xl border-2 text-xs font-medium transition-all ${sponsorType === t.value ? t.cls + ' shadow-sm' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}
                       >
-                        <t.icon size={16} /> {t.label}
+                        {t.label}
                       </button>
                     ))}
                   </div>
