@@ -33,7 +33,7 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
         : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-gray-100'
     }`}>
       {isPrimary && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
           <span className="px-3 py-1 bg-gradient-to-r from-[#9E065D] to-[#FB50B1] text-white text-xs font-bold rounded-full shadow-md">
             Primary Sponsor
           </span>
