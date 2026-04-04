@@ -98,25 +98,20 @@ const SponsorLogoUploader: React.FC<SponsorLogoUploaderProps> = ({
   const handleUpload = async () => {
     if (!previewUrl) return;
     setStatus('uploading');
-    setUploadProgress(20);
+    setUploadProgress(50);
 
     try {
-      // Resize image to standard size
-      setUploadProgress(40);
-      const resizedUrl = await resizeImage(previewUrl);
-      setUploadProgress(70);
-
-      // Save to database
+      // Save the original image directly to the database
       const { error: updateError } = await supabase
         .from('sponsors')
-        .update({ logo_url: resizedUrl, updated_at: new Date().toISOString() })
+        .update({ logo_url: previewUrl, updated_at: new Date().toISOString() })
         .eq('id', sponsorId);
 
       if (updateError) throw new Error(`Database update failed: ${updateError.message}`);
 
       setUploadProgress(100);
       setStatus('success');
-      setTimeout(() => { onUploadComplete(resizedUrl); }, 1000);
+      setTimeout(() => { onUploadComplete(previewUrl); }, 1000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Upload failed. Please try again.');
       setStatus('error');

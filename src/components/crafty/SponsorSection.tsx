@@ -27,7 +27,7 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
   const primaryLink = sponsor.website_url || sponsor.facebook_url || sponsor.instagram_url || sponsor.youtube_url || sponsor.tiktok_url;
 
   return (
-    <div className={`relative flex flex-col items-center p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
+    <div className={`relative flex flex-col items-center p-8 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
       isPrimary
         ? 'bg-gradient-to-b from-[#FEF0F8] to-white border-[#FB50B1]/30 hover:border-[#FB50B1]/60 hover:shadow-[#FB50B1]/10'
         : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-gray-100'
@@ -41,25 +41,21 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
       )}
 
       {/* Logo */}
-      <div className="w-full mb-4 mt-2">
-        <div className="w-full rounded-xl overflow-hidden" style={{ paddingBottom: '100%', position: 'relative' }}>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {sponsor.logo_url ? (
-              <img
-                src={sponsor.logo_url}
-                alt={sponsor.name}
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              />
-            ) : (
-              <div className={`w-full h-full rounded-xl flex items-center justify-center ${isPrimary ? 'bg-[#FEE6F4]' : 'bg-gray-100'}`}>
-                <span className={`text-xs font-bold text-center px-2 leading-tight ${isPrimary ? 'text-[#9E065D]' : 'text-gray-400'}`}>
-                  {sponsor.name}
-                </span>
-              </div>
-            )}
+      <div className="w-full mb-4 mt-2 flex items-center justify-center" style={{ height: '168px' }}>
+        {sponsor.logo_url ? (
+          <img
+            src={sponsor.logo_url}
+            alt={sponsor.name}
+            style={{ maxWidth: '100%', maxHeight: '168px', objectFit: 'contain', display: 'block' }}
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        ) : (
+          <div className={`w-full h-full rounded-xl flex items-center justify-center ${isPrimary ? 'bg-[#FEE6F4]' : 'bg-gray-100'}`}>
+            <span className={`text-xs font-bold text-center px-2 leading-tight ${isPrimary ? 'text-[#9E065D]' : 'text-gray-400'}`}>
+              {sponsor.name}
+            </span>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Name & Description */}
@@ -166,7 +162,7 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
               </div>
               <div className="h-px bg-gradient-to-l from-transparent to-[#FB50B1]/50 flex-1" />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
               {primarySponsors.map(sponsor => (
                 <SponsorCard key={`primary-${sponsor.id}`} sponsor={sponsor} isPrimary={true} />
               ))}
@@ -194,7 +190,7 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
               </div>
               <div className="h-px bg-gradient-to-l from-transparent to-gray-300 flex-1" />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
               {carShowSponsors.map(sponsor => (
                 <SponsorCard key={`carshow-${sponsor.id}`} sponsor={sponsor} isPrimary={false} />
               ))}
