@@ -43,6 +43,29 @@ interface SponsorEditModalProps {
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+// Resize logo preserving exact aspect ratio with transparent background.
+// Never upscales; only downscales if either dimension exceeds maxSize.
+function resizeLogo(dataUrl: string, maxSize = 600): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxSize / img.width, maxSize / img.height);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('Canvas not supported')); return; }
+      ctx.clearRect(0, 0, w, h); // keep transparency
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
 
 const tierOptions = [
   { value: 'gold', label: 'Gold', icon: Crown, cls: 'border-amber-400 bg-amber-50 text-amber-700', gradient: 'from-amber-400 to-yellow-500' },
@@ -235,16 +258,23 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
     }
     setSelectedFile(file);
     setUploadError('');
-    if (file.type === 'image/svg+xml') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewUrl(e.target?.result as string);
-        setUploadStatus('idle');
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setUploadStatus('cropping');
-    }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataUrl = e.target?.result as string;
+      if (file.type === 'image/svg+xml') {
+        // SVGs are already scalable — save as-is
+        setPreviewUrl(dataUrl);
+      } else {
+        // Resize raster images: preserve exact aspect ratio, keep transparency
+        try {
+          setPreviewUrl(await resizeLogo(dataUrl));
+        } catch {
+          setPreviewUrl(dataUrl); // fallback to original if canvas fails
+        }
+      }
+      setUploadStatus('idle');
+    };
+    reader.readAsDataURL(file);
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {

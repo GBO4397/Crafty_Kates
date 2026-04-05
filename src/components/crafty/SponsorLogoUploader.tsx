@@ -14,31 +14,23 @@ type UploadStatus = 'idle' | 'selected' | 'uploading' | 'success' | 'error';
 
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
-const LOGO_WIDTH = 300;
-const LOGO_HEIGHT = 300;
 
-// Resize image to standard size using canvas
-function resizeImage(dataUrl: string): Promise<string> {
+// Resize logo preserving exact aspect ratio with transparent background.
+// Never upscales; only downscales if either dimension exceeds maxSize.
+function resizeImage(dataUrl: string, maxSize = 600): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
+      const scale = Math.min(1, maxSize / img.width, maxSize / img.height);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
       const canvas = document.createElement('canvas');
-      canvas.width = LOGO_WIDTH;
-      canvas.height = LOGO_HEIGHT;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext('2d');
       if (!ctx) { reject(new Error('Canvas not supported')); return; }
-
-      // Use transparent background so round logos display correctly
-      ctx.clearRect(0, 0, LOGO_WIDTH, LOGO_HEIGHT);
-
-      // Calculate scale to fit within bounds while maintaining aspect ratio
-      const scale = Math.min(LOGO_WIDTH / img.width, LOGO_HEIGHT / img.height);
-      const scaledWidth = img.width * scale;
-      const scaledHeight = img.height * scale;
-      const x = (LOGO_WIDTH - scaledWidth) / 2;
-      const y = (LOGO_HEIGHT - scaledHeight) / 2;
-
-      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+      ctx.clearRect(0, 0, w, h); // transparent background
+      ctx.drawImage(img, 0, 0, w, h);
       resolve(canvas.toDataURL('image/png'));
     };
     img.onerror = reject;

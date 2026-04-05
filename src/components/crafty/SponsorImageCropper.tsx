@@ -14,7 +14,7 @@ const SponsorImageCropper: React.FC<SponsorImageCropperProps> = ({
   onCropComplete,
   onCancel,
   targetWidth = 400,
-  targetHeight = 300,
+  targetHeight = 400,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [imageEl, setImageEl] = useState<HTMLImageElement | null>(null);
@@ -23,7 +23,7 @@ const SponsorImageCropper: React.FC<SponsorImageCropperProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const canvasW = 400;
-  const canvasH = 300;
+  const canvasH = 400;
 
   // Load image from file
   useEffect(() => {
@@ -35,7 +35,7 @@ const SponsorImageCropper: React.FC<SponsorImageCropperProps> = ({
         setImageEl(img);
         const scaleX = canvasW / img.width;
         const scaleY = canvasH / img.height;
-        const initialZoom = Math.max(scaleX, scaleY);
+        const initialZoom = Math.min(scaleX, scaleY); // fit (not cover) — no cropping
         setZoom(initialZoom);
         setOffset({
           x: (canvasW - img.width * initialZoom) / 2,
@@ -111,7 +111,7 @@ const SponsorImageCropper: React.FC<SponsorImageCropperProps> = ({
     if (!imageEl) return;
     const scaleX = canvasW / imageEl.width;
     const scaleY = canvasH / imageEl.height;
-    const z = Math.max(scaleX, scaleY);
+    const z = Math.min(scaleX, scaleY);
     setZoom(z);
     setOffset({ x: (canvasW - imageEl.width * z) / 2, y: (canvasH - imageEl.height * z) / 2 });
   };
@@ -123,14 +123,13 @@ const SponsorImageCropper: React.FC<SponsorImageCropperProps> = ({
     const ctx = out.getContext('2d');
     if (!ctx || !imageEl) return;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, targetWidth, targetHeight);
+    ctx.clearRect(0, 0, targetWidth, targetHeight); // transparent background
 
     const sx = targetWidth / canvasW;
     const sy = targetHeight / canvasH;
     ctx.drawImage(imageEl, offset.x * sx, offset.y * sy, imageEl.width * zoom * sx, imageEl.height * zoom * sy);
 
-    onCropComplete(out.toDataURL('image/webp', 0.85));
+    onCropComplete(out.toDataURL('image/png')); // PNG preserves transparency
   };
 
   return (
