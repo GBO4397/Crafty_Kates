@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  Crown, Trophy, Medal, Image, ImageOff, Users,
+  Crown, Flag, Layers, Image, ImageOff, Users,
   CheckCircle, XCircle, TrendingUp, Clock
 } from 'lucide-react';
 
 interface Sponsor {
   id: string;
   name: string;
-  tier: string;
+  sponsor_type: 'primary' | 'carshow' | 'both';
   logo_url: string | null;
   website_url: string | null;
   description: string | null;
@@ -23,9 +23,9 @@ interface SponsorAdminStatsProps {
 
 const SponsorAdminStats: React.FC<SponsorAdminStatsProps> = ({ sponsors }) => {
   const total = sponsors.length;
-  const gold = sponsors.filter(s => s.tier === 'gold');
-  const silver = sponsors.filter(s => s.tier === 'silver');
-  const bronze = sponsors.filter(s => s.tier === 'bronze');
+  const primary = sponsors.filter(s => s.sponsor_type === 'primary' || s.sponsor_type === 'both');
+  const carShow = sponsors.filter(s => s.sponsor_type === 'carshow' || s.sponsor_type === 'both');
+  const both = sponsors.filter(s => s.sponsor_type === 'both');
   const withLogos = sponsors.filter(s => s.logo_url);
   const withoutLogos = sponsors.filter(s => !s.logo_url);
   const active = sponsors.filter(s => s.is_active);
@@ -55,31 +55,31 @@ const SponsorAdminStats: React.FC<SponsorAdminStatsProps> = ({ sponsors }) => {
       subtitle: `${active.length} active, ${inactive.length} inactive`,
     },
     {
-      label: 'Gold Tier',
-      value: gold.length,
+      label: 'Primary Sponsors',
+      value: primary.length,
       icon: Crown,
-      color: 'from-amber-400 to-yellow-500',
-      bgColor: 'bg-amber-50',
-      textColor: 'text-amber-700',
-      subtitle: `${gold.filter(s => s.logo_url).length}/${gold.length} logos uploaded`,
+      color: 'from-[#9E065D] to-[#FB50B1]',
+      bgColor: 'bg-pink-50',
+      textColor: 'text-[#9E065D]',
+      subtitle: `${primary.filter(s => s.logo_url).length}/${primary.length} logos uploaded`,
     },
     {
-      label: 'Silver Tier',
-      value: silver.length,
-      icon: Trophy,
-      color: 'from-slate-400 to-gray-500',
-      bgColor: 'bg-slate-50',
-      textColor: 'text-slate-700',
-      subtitle: `${silver.filter(s => s.logo_url).length}/${silver.length} logos uploaded`,
+      label: 'Car Show Sponsors',
+      value: carShow.length,
+      icon: Flag,
+      color: 'from-blue-500 to-indigo-600',
+      bgColor: 'bg-blue-50',
+      textColor: 'text-blue-700',
+      subtitle: `${carShow.filter(s => s.logo_url).length}/${carShow.length} logos uploaded`,
     },
     {
-      label: 'Bronze Tier',
-      value: bronze.length,
-      icon: Medal,
-      color: 'from-orange-400 to-amber-600',
-      bgColor: 'bg-orange-50',
-      textColor: 'text-orange-700',
-      subtitle: `${bronze.filter(s => s.logo_url).length}/${bronze.length} logos uploaded`,
+      label: 'Both Types',
+      value: both.length,
+      icon: Layers,
+      color: 'from-purple-500 to-violet-600',
+      bgColor: 'bg-purple-50',
+      textColor: 'text-purple-700',
+      subtitle: both.length > 0 ? `${both.map(s => s.name).slice(0, 2).join(', ')}${both.length > 2 ? '...' : ''}` : 'None assigned to both',
     },
     {
       label: 'Logos Uploaded',

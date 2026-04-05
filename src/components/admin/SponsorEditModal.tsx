@@ -18,7 +18,7 @@ const TikTokIcon: React.FC<{ size?: number; className?: string }> = ({ size = 14
 interface Sponsor {
   id: string;
   name: string;
-  tier: string;
+  tier?: string;
   logo_url: string | null;
   website_url: string | null;
   description: string | null;
@@ -120,7 +120,7 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
   const [name, setName] = useState(sponsor.name);
   const [description, setDescription] = useState(sponsor.description || '');
   const [websiteUrl, setWebsiteUrl] = useState(sponsor.website_url || '');
-  const [tier, setTier] = useState(sponsor.tier);
+  const [tier, setTier] = useState(sponsor.tier || '');
   const [sponsorType, setSponsorType] = useState((sponsor as any).sponsor_type || 'carshow');
   const [isActive, setIsActive] = useState(sponsor.is_active);
   const [saving, setSaving] = useState(false);
@@ -184,7 +184,7 @@ const SponsorEditModal: React.FC<SponsorEditModalProps> = ({
       name.trim() !== sponsor.name ||
       (description.trim() || null) !== (sponsor.description || null) ||
       (websiteUrl.trim() || null) !== (sponsor.website_url || null) ||
-      tier !== sponsor.tier || sponsorType !== ((sponsor as any).sponsor_type || 'carshow') ||
+      tier !== (sponsor.tier || '') || sponsorType !== ((sponsor as any).sponsor_type || 'carshow') ||
       isActive !== sponsor.is_active ||
       socialChanged
     );

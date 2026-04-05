@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Crown, Trophy, Medal, Camera, ExternalLink, Globe,
-  CheckCircle, XCircle, Pencil, Trash2, X, Check,
+  Crown, Flag, Layers, Camera, ExternalLink, Globe,
+  CheckCircle, XCircle, Pencil,
   ArrowUp, ArrowDown, Image, ImageOff, Facebook, Instagram, Youtube
 } from 'lucide-react';
 import SponsorEditModal from '@/components/admin/SponsorEditModal';
@@ -16,7 +16,7 @@ const TikTokIcon: React.FC<{ size?: number; className?: string }> = ({ size = 11
 interface Sponsor {
   id: string;
   name: string;
-  tier: string;
+  sponsor_type: 'primary' | 'carshow' | 'both';
   logo_url: string | null;
   website_url: string | null;
   description: string | null;
@@ -38,7 +38,7 @@ interface SponsorAdminCardsProps {
   onLogoUploaded: (id: string, newLogoUrl: string) => void;
 }
 
-const tierConfig: Record<string, {
+const typeConfig: Record<string, {
   label: string;
   icon: React.FC<{ size?: number; className?: string }>;
   gradient: string;
@@ -48,35 +48,35 @@ const tierConfig: Record<string, {
   textColor: string;
   badgeBg: string;
 }> = {
-  gold: {
-    label: 'Gold',
+  primary: {
+    label: 'Primary',
     icon: Crown,
-    gradient: 'from-amber-400 via-yellow-500 to-amber-600',
-    bgGradient: 'from-amber-50 to-yellow-50',
-    borderColor: 'border-amber-200',
-    activeBorder: 'border-amber-400',
-    textColor: 'text-amber-700',
-    badgeBg: 'bg-gradient-to-r from-amber-400 to-yellow-500',
+    gradient: 'from-[#9E065D] to-[#FB50B1]',
+    bgGradient: 'from-pink-50 to-rose-50',
+    borderColor: 'border-pink-200',
+    activeBorder: 'border-[#FB50B1]',
+    textColor: 'text-[#9E065D]',
+    badgeBg: 'bg-gradient-to-r from-[#9E065D] to-[#FB50B1]',
   },
-  silver: {
-    label: 'Silver',
-    icon: Trophy,
-    gradient: 'from-slate-300 via-gray-400 to-slate-500',
-    bgGradient: 'from-slate-50 to-gray-50',
-    borderColor: 'border-slate-200',
-    activeBorder: 'border-slate-400',
-    textColor: 'text-slate-700',
-    badgeBg: 'bg-gradient-to-r from-slate-400 to-gray-500',
+  carshow: {
+    label: 'Car Show',
+    icon: Flag,
+    gradient: 'from-blue-500 to-indigo-600',
+    bgGradient: 'from-blue-50 to-indigo-50',
+    borderColor: 'border-blue-200',
+    activeBorder: 'border-blue-400',
+    textColor: 'text-blue-700',
+    badgeBg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
   },
-  bronze: {
-    label: 'Bronze',
-    icon: Medal,
-    gradient: 'from-orange-400 via-amber-600 to-orange-700',
-    bgGradient: 'from-orange-50 to-amber-50',
-    borderColor: 'border-orange-200',
-    activeBorder: 'border-orange-400',
-    textColor: 'text-orange-800',
-    badgeBg: 'bg-gradient-to-r from-orange-400 to-amber-600',
+  both: {
+    label: 'Both',
+    icon: Layers,
+    gradient: 'from-purple-500 to-violet-600',
+    bgGradient: 'from-purple-50 to-violet-50',
+    borderColor: 'border-purple-200',
+    activeBorder: 'border-purple-400',
+    textColor: 'text-purple-700',
+    badgeBg: 'bg-gradient-to-r from-purple-500 to-violet-600',
   },
 };
 
@@ -113,8 +113,8 @@ const SponsorCard: React.FC<SponsorCardProps> = ({
 }) => {
   const [imgError, setImgError] = useState(false);
 
-  const config = tierConfig[sponsor.tier] || tierConfig.bronze;
-  const TierIcon = config.icon;
+  const config = typeConfig[sponsor.sponsor_type] || typeConfig.carshow;
+  const TypeIcon = config.icon;
   const hasLogo = sponsor.logo_url && !imgError;
 
   useEffect(() => {
@@ -131,11 +131,11 @@ const SponsorCard: React.FC<SponsorCardProps> = ({
       {/* Top accent bar */}
       <div className={`h-1.5 bg-gradient-to-r ${config.gradient}`} />
 
-      {/* Card Header: Tier badge + controls */}
+      {/* Card Header: Type badge + controls */}
       <div className="flex items-center justify-between px-4 pt-3 pb-1">
-        {/* Tier Badge */}
+        {/* Type Badge */}
         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${config.badgeBg} text-white shadow-sm`}>
-          <TierIcon size={11} />
+          <TypeIcon size={11} />
           {config.label}
         </div>
 
@@ -278,7 +278,7 @@ const SponsorAdminCards: React.FC<SponsorAdminCardsProps> = ({
   sponsors, onUpdateSponsor, onDeleteSponsor, onReorder, onLogoUploaded
 }) => {
   const [editingSponsor, setEditingSponsor] = useState<Sponsor | null>(null);
-  const [filterTier, setFilterTier] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
 
   const handleMoveUp = (id: string) => {
     const idx = sponsors.findIndex(s => s.id === id);
@@ -310,33 +310,33 @@ const SponsorAdminCards: React.FC<SponsorAdminCardsProps> = ({
 
   // Filter sponsors
   let filtered = [...sponsors];
-  if (filterTier !== 'all') filtered = filtered.filter(s => s.tier === filterTier);
+  if (filterType !== 'all') filtered = filtered.filter(s => s.sponsor_type === filterType);
 
-  // Group by tier
-  const goldSponsors = filtered.filter(s => s.tier === 'gold');
-  const silverSponsors = filtered.filter(s => s.tier === 'silver');
-  const bronzeSponsors = filtered.filter(s => s.tier === 'bronze');
+  // Group by sponsor type
+  const primarySponsors = filtered.filter(s => s.sponsor_type === 'primary');
+  const carShowSponsors = filtered.filter(s => s.sponsor_type === 'carshow');
+  const bothSponsors = filtered.filter(s => s.sponsor_type === 'both');
 
-  const renderTierGroup = (tier: string, tierSponsors: Sponsor[]) => {
-    if (tierSponsors.length === 0) return null;
-    const tc = tierConfig[tier];
+  const renderTypeGroup = (type: string, typeSponsors: Sponsor[]) => {
+    if (typeSponsors.length === 0) return null;
+    const tc = typeConfig[type];
     const TIcon = tc.icon;
 
     return (
-      <div key={tier} className="mb-10 last:mb-0">
+      <div key={type} className="mb-10 last:mb-0">
         <div className="flex items-center gap-3 mb-5">
           <div className={`w-9 h-9 bg-gradient-to-br ${tc.gradient} rounded-xl flex items-center justify-center shadow-sm`}>
             <TIcon className="w-4 h-4 text-white" />
           </div>
           <div>
             <h3 className={`text-base font-bold ${tc.textColor}`}>{tc.label} Sponsors</h3>
-            <p className="text-xs text-gray-400">{tierSponsors.length} sponsor{tierSponsors.length !== 1 ? 's' : ''} — {tierSponsors.filter(s => s.logo_url).length} with logos</p>
+            <p className="text-xs text-gray-400">{typeSponsors.length} sponsor{typeSponsors.length !== 1 ? 's' : ''} — {typeSponsors.filter(s => s.logo_url).length} with logos</p>
           </div>
           <div className="flex-1 h-px bg-gray-100" />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {tierSponsors.map((sponsor) => (
+          {typeSponsors.map((sponsor) => (
             <SponsorCard
               key={sponsor.id}
               sponsor={sponsor}
@@ -360,16 +360,16 @@ const SponsorAdminCards: React.FC<SponsorAdminCardsProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">View:</span>
           {[
-            { key: 'all', label: 'All Tiers', count: sponsors.length },
-            { key: 'gold', label: 'Gold', count: sponsors.filter(s => s.tier === 'gold').length, icon: Crown },
-            { key: 'silver', label: 'Silver', count: sponsors.filter(s => s.tier === 'silver').length, icon: Trophy },
-            { key: 'bronze', label: 'Bronze', count: sponsors.filter(s => s.tier === 'bronze').length, icon: Medal },
+            { key: 'all', label: 'All Sponsors', count: sponsors.length, icon: null },
+            { key: 'primary', label: 'Primary', count: sponsors.filter(s => s.sponsor_type === 'primary').length, icon: Crown },
+            { key: 'carshow', label: 'Car Show', count: sponsors.filter(s => s.sponsor_type === 'carshow').length, icon: Flag },
+            { key: 'both', label: 'Both', count: sponsors.filter(s => s.sponsor_type === 'both').length, icon: Layers },
           ].map(btn => (
             <button
               key={btn.key}
-              onClick={() => setFilterTier(btn.key)}
+              onClick={() => setFilterType(btn.key)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                filterTier === btn.key
+                filterType === btn.key
                   ? 'bg-[#9E065D] text-white border-[#9E065D] shadow-sm'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
               }`}
@@ -377,7 +377,7 @@ const SponsorAdminCards: React.FC<SponsorAdminCardsProps> = ({
               {btn.icon && <btn.icon size={12} />}
               {btn.label}
               <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                filterTier === btn.key ? 'bg-white/20' : 'bg-gray-100'
+                filterType === btn.key ? 'bg-white/20' : 'bg-gray-100'
               }`}>
                 {btn.count}
               </span>
@@ -407,12 +407,12 @@ const SponsorAdminCards: React.FC<SponsorAdminCardsProps> = ({
         </p>
       </div>
 
-      {/* Cards by Tier */}
-      {filterTier === 'all' ? (
+      {/* Cards by Sponsor Type */}
+      {filterType === 'all' ? (
         <>
-          {renderTierGroup('gold', goldSponsors)}
-          {renderTierGroup('silver', silverSponsors)}
-          {renderTierGroup('bronze', bronzeSponsors)}
+          {renderTypeGroup('primary', primarySponsors)}
+          {renderTypeGroup('carshow', carShowSponsors)}
+          {renderTypeGroup('both', bothSponsors)}
         </>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

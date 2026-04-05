@@ -8,7 +8,6 @@ interface SponsorLogoUploaderProps {
   currentLogoUrl: string | null;
   onUploadComplete: (newLogoUrl: string) => void;
   onCancel: () => void;
-  tier: 'gold' | 'silver' | 'bronze';
 }
 
 type UploadStatus = 'idle' | 'selected' | 'uploading' | 'success' | 'error';
@@ -98,20 +97,25 @@ const SponsorLogoUploader: React.FC<SponsorLogoUploaderProps> = ({
   const handleUpload = async () => {
     if (!previewUrl) return;
     setStatus('uploading');
-    setUploadProgress(50);
+    setUploadProgress(30);
 
     try {
-      // Save the original image directly to the database
+      // Resize raster images to consistent size; pass SVGs through unchanged
+      const isSvg = selectedFile?.type === 'image/svg+xml';
+      const logoUrl = isSvg ? previewUrl : await resizeImage(previewUrl);
+
+      setUploadProgress(70);
+
       const { error: updateError } = await supabase
         .from('sponsors')
-        .update({ logo_url: previewUrl, updated_at: new Date().toISOString() })
+        .update({ logo_url: logoUrl, updated_at: new Date().toISOString() })
         .eq('id', sponsorId);
 
       if (updateError) throw new Error(`Database update failed: ${updateError.message}`);
 
       setUploadProgress(100);
       setStatus('success');
-      setTimeout(() => { onUploadComplete(previewUrl); }, 1000);
+      setTimeout(() => { onUploadComplete(logoUrl); }, 1000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Upload failed. Please try again.');
       setStatus('error');
@@ -138,7 +142,7 @@ const SponsorLogoUploader: React.FC<SponsorLogoUploaderProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-gray-900">Upload Logo</h3>
-              <p className="text-gray-500 text-xs">{sponsorName} — Logo will be resized to {LOGO_WIDTH}x{LOGO_HEIGHT}px</p>
+              <p className="text-gray-500 text-xs">{sponsorName} — Logo will be optimized for display</p>
             </div>
           </div>
           {status !== 'uploading' && (
@@ -176,7 +180,7 @@ const SponsorLogoUploader: React.FC<SponsorLogoUploaderProps> = ({
               <p className="text-gray-400 text-sm mb-3">PNG, JPG, SVG, or WebP — Max 5MB</p>
               <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
                 <ImageIcon size={12} />
-                <span>Will be resized to {LOGO_WIDTH}x{LOGO_HEIGHT}px automatically</span>
+                <span>Automatically optimized — aspect ratio preserved</span>
               </div>
             </div>
           )}
@@ -211,8 +215,8 @@ const SponsorLogoUploader: React.FC<SponsorLogoUploaderProps> = ({
                   <span className="text-sm font-bold text-[#9E065D]">{uploadProgress}%</span>
                 </div>
               </div>
-              <p className="font-semibold text-gray-800">Resizing & saving logo...</p>
-              <p className="text-gray-400 text-sm mt-1">Standardizing to {LOGO_WIDTH}x{LOGO_HEIGHT}px</p>
+              <p className="font-semibold text-gray-800">Optimizing & saving logo...</p>
+              <p className="text-gray-400 text-sm mt-1">Preserving aspect ratio, optimizing size</p>
             </div>
           )}
 
@@ -223,7 +227,7 @@ const SponsorLogoUploader: React.FC<SponsorLogoUploaderProps> = ({
                 <Check size={32} className="text-green-600" />
               </div>
               <p className="font-semibold text-gray-800">Logo saved!</p>
-              <p className="text-gray-400 text-sm mt-1">Logo has been resized and saved successfully.</p>
+              <p className="text-gray-400 text-sm mt-1">Logo has been optimized and saved successfully.</p>
             </div>
           )}
 
