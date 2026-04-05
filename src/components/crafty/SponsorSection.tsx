@@ -24,7 +24,9 @@ interface Sponsor {
 }
 
 const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ sponsor, isPrimary = false }) => {
+  const [imgError, setImgError] = useState(false);
   const primaryLink = sponsor.website_url || sponsor.facebook_url || sponsor.instagram_url || sponsor.youtube_url || sponsor.tiktok_url;
+  const hasLogo = !!sponsor.logo_url && !imgError;
 
   return (
     <div className={`relative flex flex-col items-center p-8 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
@@ -42,16 +44,16 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
 
       {/* Logo */}
       <div className="w-full mb-4 mt-2 flex items-center justify-center" style={{ height: '168px' }}>
-        {sponsor.logo_url ? (
+        {hasLogo ? (
           <img
-            src={sponsor.logo_url}
+            src={sponsor.logo_url!}
             alt={sponsor.name}
             style={{ maxWidth: '100%', maxHeight: '168px', objectFit: 'contain', display: 'block' }}
-            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            onError={() => setImgError(true)}
           />
         ) : (
-          <div className={`w-full h-full rounded-xl flex items-center justify-center ${isPrimary ? 'bg-[#FEE6F4]' : 'bg-gray-100'}`}>
-            <span className={`text-xs font-bold text-center px-2 leading-tight ${isPrimary ? 'text-[#9E065D]' : 'text-gray-400'}`}>
+          <div className={`w-full h-full rounded-xl flex items-center justify-center px-4 ${isPrimary ? 'bg-[#FEE6F4]' : 'bg-gray-100'}`}>
+            <span className={`font-bold text-center leading-tight ${isPrimary ? 'text-[#9E065D] text-sm' : 'text-gray-400 text-xs'}`}>
               {sponsor.name}
             </span>
           </div>
@@ -59,9 +61,9 @@ const SponsorCard: React.FC<{ sponsor: Sponsor; isPrimary?: boolean }> = ({ spon
       </div>
 
       {/* Name & Description */}
-      <h3 className="text-sm font-bold text-gray-900 text-center mb-1">{sponsor.name}</h3>
+      <h3 className={`font-bold text-gray-900 text-center mb-1 ${isPrimary ? 'text-base' : 'text-sm'}`}>{sponsor.name}</h3>
       {sponsor.description && (
-        <p className="text-xs text-gray-500 text-center mb-3 leading-relaxed">{sponsor.description}</p>
+        <p className={`text-gray-500 text-center mb-3 leading-relaxed ${isPrimary ? 'text-sm' : 'text-xs'}`}>{sponsor.description}</p>
       )}
 
       {/* Social Links */}
@@ -153,7 +155,7 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
 
         {/* Primary Sponsors */}
         {primarySponsors.length > 0 && (
-          <div className="mb-14">
+          <div className="mb-14 rounded-3xl bg-gradient-to-br from-[#FEE6F4] via-[#FDF2FA] to-[#FCE7F3] p-8 shadow-inner">
             <div className="flex items-center justify-center gap-3 mb-8">
               <div className="h-px bg-gradient-to-r from-transparent to-[#FB50B1]/50 flex-1" />
               <div className="text-center px-6 py-3 bg-gradient-to-r from-[#9E065D] to-[#FB50B1] rounded-2xl shadow-lg shadow-[#9E065D]/20">
