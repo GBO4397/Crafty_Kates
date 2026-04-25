@@ -11,11 +11,13 @@ export const LOGO = '/images/site/KATES-LOGO-512x512-1-150x150.webp';
 export const HERO = {
   background: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-14.jpeg',
   licensePlate: '/images/site/KATES-LOGO-512x512-1-150x150.webp',
+  accentImage: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-5.jpeg',
 };
 
 // ----- ABOUT SECTION -----
 export const ABOUT = {
   portrait: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-66.jpeg',
+  accentImage: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-6.jpeg',
 };
 
 // ----- EVENTS SECTION -----

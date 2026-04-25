@@ -7,6 +7,7 @@ const HeroSection: React.FC = () => {
   const HERO = {
     background: getImage('hero-background'),
     licensePlate: getImage('hero-license-plate'),
+    accentImage: getImage('hero-accent'),
   };
 
   const [show, setShow] = useState(false);
@@ -20,7 +21,7 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section id="hero" className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section id="hero" className="relative min-h-[90vh] flex items-center">
       {/* BG Image */}
       <div className="absolute inset-0 z-0">
         <img src={HERO.background} alt="Classic car show background" className="w-full h-full object-cover" loading="eager" />
@@ -97,6 +98,14 @@ const HeroSection: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Accent image — overlaps the hero/about boundary */}
+      <div className={`hidden lg:block absolute bottom-0 right-16 translate-y-1/2 z-20 transition-all duration-1000 delay-500 ease-out ${show ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
+        <div className="relative w-60 h-72 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 ring-1 ring-black/10">
+          <img src={HERO.accentImage} alt="Classic car show highlight" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         </div>
       </div>
     </section>
