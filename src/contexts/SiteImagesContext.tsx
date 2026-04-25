@@ -74,10 +74,19 @@ export const SiteImagesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const imgs = data || [];
       setImages(imgs);
 
-      // Build a map of slot_key -> image_url for quick lookups
+      // Build a map of slot_key -> image_url for quick lookups.
+      // Only trust URLs from the correct Supabase project or relative paths —
+      // stale entries pointing at old domains (databasepad.com, WP uploads, etc.)
+      // are dropped so the static fallbacks in imageConfig.ts take over.
+      const TRUSTED_SUPABASE = 'gufmfkkdqgjomuitbgtt.supabase.co';
+      const isTrustedUrl = (url: string) =>
+        url.startsWith('/') ||
+        url.startsWith('blob:') ||
+        url.includes(TRUSTED_SUPABASE);
+
       const map: Record<string, string> = {};
       imgs.forEach(img => {
-        if (img.image_url && img.category === 'site') {
+        if (img.image_url && img.category === 'site' && isTrustedUrl(img.image_url)) {
           map[img.slot_key] = img.image_url;
         }
       });
