@@ -4,10 +4,7 @@ import { useSiteImages } from '@/contexts/SiteImagesContext';
 
 const AboutSection: React.FC = () => {
   const { getImage } = useSiteImages();
-  const ABOUT = {
-    portrait: getImage('about-portrait'),
-    accentImage: getImage('about-accent'),
-  };
+  const ABOUT = { portrait: getImage('about-portrait') };
 
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -67,9 +64,6 @@ const AboutSection: React.FC = () => {
             <h3 className="font-heading text-3xl text-[#9E065D] tracking-wide mb-6">WHERE PASSION MEETS PURPOSE</h3>
             <div className="space-y-4 text-gray-600 leading-relaxed">
               <p>With a 30-year career spanning film industry craft services, race track promotion, and automotive modeling, Katherine "Crafty Kate" has built an unshakeable legacy as a promoter, racer, and community advocate who believes every car has a soul—and every event should give back.</p>
-              <div className="hidden xl:block float-right ml-5 mb-3 w-44 h-56 rounded-2xl overflow-hidden shadow-xl border border-[#FEE6F4] flex-shrink-0">
-                <img src={ABOUT.accentImage} alt="Classic car show" className="w-full h-full object-cover" />
-              </div>
               <p>From her days as a promotional model working alongside legends like George "The Bushmaster" through the 1990s racing circuit, to becoming the driving force behind the Classic Burgers Annual Car Show, Kate has dedicated her life to three passions: celebrating American muscle, supporting local racers, and making a tangible difference through her signature cause—the Ridgecrest Animal Shelter.</p>
               <p>She spent 30 years feeding film crews, a lifetime at race tracks, and every spare moment giving back to her community. She's crafty, all right—but not in the way you might think. Kate's the real deal: a woman whose dedication to cars, racing, and animals has left an indelible mark on everyone she's touched.</p>
             </div>
