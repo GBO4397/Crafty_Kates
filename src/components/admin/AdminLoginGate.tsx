@@ -7,9 +7,9 @@ import {
 } from 'lucide-react';
 
 // ─── Shared Admin Password ──────────────────────────────────────
-// All admin pages use this same password.
-// For production, use an environment variable or edge function.
-export const ADMIN_PASSWORD = 'CraftyKates2026!';
+// Loaded from .env (VITE_ADMIN_PASSWORD). Do NOT hardcode this value.
+// For production, deploy the verify-admin Supabase edge function instead.
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
 
 // Generate a simple token for session persistence
 export function generateAdminToken(): string {

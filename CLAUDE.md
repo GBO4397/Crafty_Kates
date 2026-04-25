@@ -279,16 +279,34 @@ SELECT value FROM site_settings WHERE key = 'admin_password';
 
 ---
 
+## Claude Tool Division of Labor
+
+This project uses a consolidated Claude setup. Each tool has a specific role — don't duplicate effort across environments.
+
+### Claude Code (Primary — Coding)
+- Run from inside the `Crafty_Kates/` repo directory: `claude`
+- Handles all code changes, builds, git commits, and Supabase query testing
+- This CLAUDE.md is the single source of truth — it loads automatically
+
+### Claude Cowork (Supporting — Non-Code Tasks)
+- Connected to: `C:\Users\gbosy\OneDrive - Velocity Tech Solutions\Documents 1\GitHub\Crafty_Kates`
+- Handles: sponsor documents, image asset management, reports, docx/pptx/xlsx generation, admin workflows outside the codebase
+- Use when the output is a file or document, not a code change
+
+### Claude Chat (claude.ai)
+- **Retired for this project.** The Chat project has been removed — CLAUDE.md covers all persistent context.
+- Use Claude Chat only for quick one-off questions unrelated to the codebase.
+
+---
+
 ## For Claude Code Sessions
 
-When you start a session, copy/paste this:
-
-> "I'm working on the Crafty Kates website (craftykates.com), a React + TypeScript + Vite project deployed on Netlify with Supabase backend. The project is at the Crafty_Kates repo on GitHub. The key system is a two-tier sponsor model: Primary Sponsors (support Crafty Kates overall) and Car Show Sponsors (event-only), with sponsors able to sponsor both. Sponsors are stored in Supabase with a sponsor_type column ('primary', 'carshow', or 'both'). They display in two sections on the homepage with different visual styling. Admin dashboard is at craftykates.com with password CraftyKates2026!. Images are in public/images/site/ and configured in imageConfig.ts. The site is live on Netlify and auto-deploys from GitHub main. Supabase URL is gufmfkkdqgjomuitbgtt.supabase.co with anon key [provided above]. What do you need help with?"
+Simply run `claude` from the repo root — CLAUDE.md loads automatically. No copy/paste prompt needed.
 
 ---
 
 ## Last Updated
-April 25, 2026
+April 25, 2026 — Consolidated Claude environment (Code + Cowork, Chat retired)
 
 **Maintained By:** Velocity Tech Solutions  
 **For Questions:** Contact Kate at craftykates@mail.com or Rods West (703 E Dolphin, Ridgecrest, CA 93555)

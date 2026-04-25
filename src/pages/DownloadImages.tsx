@@ -6,8 +6,8 @@ import { FolderArchive as FolderArchiveIcon } from 'lucide-react';
 
 
 // Supabase edge function URL for proxying image downloads (bypasses CORS)
-const SUPABASE_URL = 'https://csdwcjbfexwtaqpmzzkj.databasepad.com';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhmNzFmNzlhLWZkMjAtNDYyNy1hMzVmLTExZTc5NjhlY2QwYSJ9.eyJwcm9qZWN0SWQiOiJjc2R3Y2piZmV4d3RhcXBtenpraiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzcxNTEwODE0LCJleHAiOjIwODY4NzA4MTQsImlzcyI6ImZhbW91cy5kYXRhYmFzZXBhZCIsImF1ZCI6ImZhbW91cy5jbGllbnRzIn0.7PlmeZjxGTplqF0juXTQ_9vJcleqkcSL6_D3fGm0WIg';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 const PROXY_URL = `${SUPABASE_URL}/functions/v1/proxy-image`;
 
 // ─── All image URLs used across the site ───
@@ -49,7 +49,6 @@ const WALLIN_FILENAMES = [
   'IMG_9798.jpeg',
   'IMG_9797.jpeg',
   'IMG_9796.jpeg',
-  'IMG_9795.jpeg',
   'IMG_9794.jpeg',
   'IMG_9793.jpeg',
   'IMG_9792.jpeg',
@@ -145,8 +144,8 @@ const buildImageManifest = (): ImageEntry[] => {
     label: 'Classic Cars',
   });
   images.push({
-    url: `${WP}/IMG_9795.jpeg`,
-    filename: 'IMG_9795.jpeg',
+    url: `${WP}/IMG_9796.jpeg`,
+    filename: 'IMG_9796.jpeg',
     folder: '07-car-show',
     label: 'Registration Hero',
   });

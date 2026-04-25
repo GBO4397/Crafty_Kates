@@ -14,7 +14,7 @@ import type { SiteImageSlot } from '@/components/admin/ImageAdminCard';
 // ─── Shared Admin Password (same as Sponsor Admin) ──────────────
 // This password is checked client-side as a primary gate.
 // For production, use an environment variable or edge function.
-const ADMIN_PASSWORD = 'CraftyKates2026!';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
 
 // Generate a simple token for session persistence
 function generateToken(): string {

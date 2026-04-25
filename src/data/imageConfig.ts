@@ -38,7 +38,7 @@ export const COMMUNITY = {
 export const CAR_SHOW = {
   heroBg: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-12.jpeg',
   classicCars: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-4.jpeg',
-  registrationHero: '/images/site/IMG_9795.jpeg',
+  registrationHero: '/images/site/IMG_9796.jpeg',
 };
 
 // ----- SPONSOR LOGOS -----
@@ -95,7 +95,6 @@ const WALLIN_FILENAMES = [
   'IMG_9798.jpeg',
   'IMG_9797.jpeg',
   'IMG_9796.jpeg',
-  'IMG_9795.jpeg',
   'IMG_9794.jpeg',
   'IMG_9793.jpeg',
   'IMG_9792.jpeg',

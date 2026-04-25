@@ -1,34 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const SUPABASE_URL = 'https://csdwcjbfexwtaqpmzzkj.databasepad.com';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhmNzFmNzlhLWZkMjAtNDYyNy1hMzVmLTExZTc5NjhlY2QwYSJ9.eyJwcm9qZWN0SWQiOiJjc2R3Y2piZmV4d3RhcXBtenpraiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzcxNTEwODE0LCJleHAiOjIwODY4NzA4MTQsImlzcyI6ImZhbW91cy5kYXRhYmFzZXBhZCIsImF1ZCI6ImZhbW91cy5jbGllbnRzIn0.7PlmeZjxGTplqF0juXTQ_9vJcleqkcSL6_D3fGm0WIg';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 // Global cache for proxied blob URLs to avoid re-fetching
 const blobCache = new Map<string, string>();
 const pendingFetches = new Map<string, Promise<string>>();
 
+// URLs that should be used as-is without proxying
+function isDirectUrl(url: string): boolean {
+  return (
+    url.startsWith('data:') ||
+    url.startsWith('blob:') ||
+    url.startsWith('/') ||
+    url.includes('supabase.co/storage')
+  );
+}
+
 export async function fetchProxiedImage(originalUrl: string): Promise<string> {
-  // If it's already a Supabase storage URL or data URL, return as-is
-  if (
-    originalUrl.startsWith('data:') ||
-    originalUrl.startsWith('blob:') ||
-    originalUrl.includes('databasepad.com/storage') ||
-    originalUrl.startsWith('/placeholder')
-  ) {
-    return originalUrl;
-  }
+  if (isDirectUrl(originalUrl)) return originalUrl;
 
   // Check cache
-  if (blobCache.has(originalUrl)) {
-    return blobCache.get(originalUrl)!;
-  }
+  if (blobCache.has(originalUrl)) return blobCache.get(originalUrl)!;
 
-  // Check if there's already a pending fetch for this URL
-  if (pendingFetches.has(originalUrl)) {
-    return pendingFetches.get(originalUrl)!;
-  }
+  // Deduplicate in-flight requests
+  if (pendingFetches.has(originalUrl)) return pendingFetches.get(originalUrl)!;
 
-  // Create the fetch promise
   const fetchPromise = (async () => {
     try {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/proxy-image`, {
@@ -42,20 +39,18 @@ export async function fetchProxiedImage(originalUrl: string): Promise<string> {
 
       if (!response.ok) {
         console.warn(`Proxy failed for ${originalUrl}: ${response.status}`);
-        return originalUrl; // Fall back to original URL
+        return originalUrl;
       }
 
       const blob = await response.blob();
-      if (blob.size === 0) {
-        return originalUrl;
-      }
+      if (blob.size === 0) return originalUrl;
 
       const blobUrl = URL.createObjectURL(blob);
       blobCache.set(originalUrl, blobUrl);
       return blobUrl;
     } catch (err) {
       console.warn(`Proxy error for ${originalUrl}:`, err);
-      return originalUrl; // Fall back to original URL
+      return originalUrl;
     } finally {
       pendingFetches.delete(originalUrl);
     }
@@ -70,15 +65,8 @@ export function useProxiedImage(originalUrl: string | undefined): { src: string;
   const [src, setSrc] = useState<string>(() => {
     if (!originalUrl) return '/placeholder.svg';
     if (blobCache.has(originalUrl)) return blobCache.get(originalUrl)!;
-    if (
-      originalUrl.startsWith('data:') ||
-      originalUrl.startsWith('blob:') ||
-      originalUrl.includes('databasepad.com/storage') ||
-      originalUrl.startsWith('/placeholder')
-    ) {
-      return originalUrl;
-    }
-    return ''; // Will be loading
+    if (isDirectUrl(originalUrl)) return originalUrl;
+    return ''; // will load async
   });
   const [loading, setLoading] = useState(!src);
   const [error, setError] = useState(false);
@@ -90,14 +78,7 @@ export function useProxiedImage(originalUrl: string | undefined): { src: string;
       return;
     }
 
-    // Already cached or non-proxied URL
-    if (
-      blobCache.has(originalUrl) ||
-      originalUrl.startsWith('data:') ||
-      originalUrl.startsWith('blob:') ||
-      originalUrl.includes('databasepad.com/storage') ||
-      originalUrl.startsWith('/placeholder')
-    ) {
+    if (blobCache.has(originalUrl) || isDirectUrl(originalUrl)) {
       setSrc(blobCache.get(originalUrl) || originalUrl);
       setLoading(false);
       return;
@@ -111,9 +92,6 @@ export function useProxiedImage(originalUrl: string | undefined): { src: string;
       if (!cancelled) {
         setSrc(proxiedUrl);
         setLoading(false);
-        if (proxiedUrl === originalUrl && !originalUrl.includes('databasepad.com')) {
-          // Proxy failed, using original - might still fail
-        }
       }
     }).catch(() => {
       if (!cancelled) {
@@ -135,6 +113,7 @@ export function useProxiedImages(originalUrls: string[]): { images: string[]; lo
     originalUrls.map(url => blobCache.get(url) || '')
   );
   const [loading, setLoading] = useState(true);
+  const urlKey = originalUrls.join(',');
 
   useEffect(() => {
     let cancelled = false;
@@ -147,7 +126,8 @@ export function useProxiedImages(originalUrls: string[]): { images: string[]; lo
     });
 
     return () => { cancelled = true; };
-  }, [originalUrls.join(',')]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlKey]);
 
   return { images, loading };
 }
@@ -184,7 +164,6 @@ const ProxiedImage: React.FC<ProxiedImageProps> = ({
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setImgError(true);
-    // Try fallback
     if (fallbackSrc && (e.target as HTMLImageElement).src !== fallbackSrc) {
       (e.target as HTMLImageElement).src = fallbackSrc;
     }

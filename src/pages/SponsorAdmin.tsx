@@ -68,7 +68,7 @@ function normalizeSponsor(data: any): Sponsor {
   };
 }
 
-const ADMIN_PASSWORD = 'CraftyKates2026!';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
 
 function generateToken(): string {
   return btoa(Date.now().toString(36) + Math.random().toString(36).slice(2));

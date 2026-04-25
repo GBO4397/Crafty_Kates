@@ -34,7 +34,7 @@ interface CommunityEvent {
   reviewed_at: string | null;
 }
 
-const ADMIN_PASSWORD = 'CraftyKates2026!';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
 
 const CATEGORY_LABELS: Record<string, string> = {
   'car-show': 'Car Show',

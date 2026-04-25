@@ -6,7 +6,9 @@ import {
   LayoutDashboard, ChevronRight, Menu, X, Ticket, UserCheck
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { checkAdminAuth, adminLogout, ADMIN_PASSWORD, generateAdminToken } from '@/components/admin/AdminLoginGate';
+import { checkAdminAuth, adminLogout, generateAdminToken } from '@/components/admin/AdminLoginGate';
+
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
 
 // Lazy load admin page content components
 const SponsorAdmin = lazy(() => import('./SponsorAdmin'));
