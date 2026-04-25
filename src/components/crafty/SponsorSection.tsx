@@ -128,8 +128,8 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
   const carShowSponsors = sponsors.filter(s => s.sponsor_type === 'carshow' || s.sponsor_type === 'both');
 
   if (loading) return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 text-center">
+    <section className="py-16 sm:py-20 lg:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="w-8 h-8 border-2 border-[#9E065D] border-t-transparent rounded-full animate-spin mx-auto" />
       </div>
     </section>
@@ -138,7 +138,7 @@ const SponsorSection: React.FC<SponsorSectionProps> = ({ onContactClick }) => {
   if (sponsors.length === 0) return null;
 
   return (
-    <section id="sponsors" className="py-20 bg-gradient-to-b from-white to-gray-50/50">
+    <section id="sponsors" className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Section Header */}

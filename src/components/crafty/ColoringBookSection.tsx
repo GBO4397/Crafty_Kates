@@ -49,7 +49,7 @@ const ColoringBookSection: React.FC = () => {
   const regularBooks = books.filter((b) => !b.featured);
 
   return (
-    <section id="coloring-books" className="py-20 bg-gradient-to-b from-white via-[#FEFBF7] to-white">
+    <section id="coloring-books" className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white via-[#FEFBF7] to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">

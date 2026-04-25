@@ -127,7 +127,7 @@ const NostalgiaSection: React.FC = () => {
   const nostalgiaSponsors = sponsorDirectory.filter(s => s.category === 'nostalgia');
 
   return (
-    <section ref={sectionRef} className="py-24 bg-[#FEE6F4]/10 relative overflow-hidden">
+    <section ref={sectionRef} className="py-16 sm:py-20 lg:py-24 bg-[#FEE6F4]/10 relative overflow-hidden">
       {/* Decorative */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FB50B1]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
 

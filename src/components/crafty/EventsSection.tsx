@@ -96,7 +96,7 @@ const EventsSection: React.FC = () => {
 
   return (
     <>
-      <section id="events" ref={sectionRef} className="py-24 bg-white relative overflow-hidden">
+      <section id="events" ref={sectionRef} className="py-16 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
         <div className="absolute top-20 right-0 w-80 h-80 bg-[#FEE6F4]/40 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-0 w-64 h-64 bg-[#FB50B1]/5 rounded-full blur-3xl" />
 

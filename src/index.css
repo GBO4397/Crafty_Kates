@@ -106,6 +106,42 @@
   }
 }
 
+@layer components {
+  /* Standard full-width section container */
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Narrow container for centred text-heavy content */
+  .section-container-narrow {
+    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Standard section vertical rhythm */
+  .section-py {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  /* Primary CTA button — consistent across site */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-8 py-4 rounded-xl
+           bg-gradient-to-r from-[#9E065D] to-[#7D0348]
+           hover:from-[#FB50B1] hover:to-[#9E065D]
+           text-white font-medium text-base
+           transition-all duration-300
+           shadow-lg shadow-[#9E065D]/30
+           hover:shadow-[#FB50B1]/40 hover:scale-105;
+  }
+
+  /* Secondary / outline button */
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-8 py-4 rounded-xl
+           border-2 border-white/30 hover:border-[#FB50B1]
+           text-white font-medium text-base
+           transition-all duration-300 hover:bg-[#FB50B1]/10;
+  }
+}
+
 
 
 .markdown-editor {

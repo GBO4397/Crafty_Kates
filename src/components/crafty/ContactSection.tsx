@@ -96,7 +96,7 @@ const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" ref={sectionRef} className="py-24 bg-white relative overflow-hidden">
+    <section id="contact" ref={sectionRef} className="py-16 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
       <div className="absolute top-0 left-0 w-96 h-96 bg-[#FEE6F4]/30 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">

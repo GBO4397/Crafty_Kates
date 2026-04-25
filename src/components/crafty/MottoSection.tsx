@@ -38,7 +38,7 @@ const MottoSection: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[#1a0a12]/90 via-[#7D0348]/80 to-[#9E065D]/70" />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
           <div className="mb-8">
             <div className="inline-flex items-center gap-3 mb-6">
