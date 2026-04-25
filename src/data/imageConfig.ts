@@ -10,12 +10,12 @@ export const LOGO = '/images/site/KATES-LOGO-512x512-1-150x150.webp';
 // ----- HERO SECTION -----
 export const HERO = {
   background: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-14.jpeg',
-  licensePlate: '/images/site/KATES-LOGO-512x512-1-150x150.webp',
+  licensePlate: '/images/site/Welcome-License-Plate.webp',
 };
 
 // ----- ABOUT SECTION -----
 export const ABOUT = {
-  portrait: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-66.jpeg',
+  portrait: '/images/site/Crafty_Kate_SIlly_Willy.jpg',
 };
 
 // ----- EVENTS SECTION -----
