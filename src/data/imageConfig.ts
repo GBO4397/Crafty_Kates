@@ -9,7 +9,7 @@ export const LOGO = '/images/site/KATES-LOGO-512x512-1-150x150.webp';
 
 // ----- HERO SECTION -----
 export const HERO = {
-  background: '/images/site/2024_03_Classic_Cars_Classic_Burgers-100-14.jpeg',
+  background: '/images/site/IMG_3371.jpeg',
   licensePlate: '/images/site/Welcome-License-Plate.webp',
 };
 
