@@ -28,8 +28,10 @@ interface FormData {
   image_url: string;
   website_url: string;
   ticket_url: string;
-  is_free: boolean;
-  ticket_price: string;
+  admission_free: boolean;
+  price_adults: string;
+  price_kids: string;
+  price_kids_free_under_age: string;
 }
 
 const INITIAL_FORM: FormData = {
@@ -47,8 +49,10 @@ const INITIAL_FORM: FormData = {
   image_url: '',
   website_url: '',
   ticket_url: '',
-  is_free: true,
-  ticket_price: '',
+  admission_free: true,
+  price_adults: '',
+  price_kids: '',
+  price_kids_free_under_age: '',
 };
 
 const CATEGORIES = [
@@ -58,6 +62,7 @@ const CATEGORIES = [
   { value: 'festival', label: 'Festival / Fair' },
   { value: 'meetup', label: 'Meetup / Cruise' },
   { value: 'swap-meet', label: 'Swap Meet' },
+  { value: 'racing', label: 'Racing Event' },
   { value: 'other', label: 'Other' },
 ];
 
@@ -226,9 +231,17 @@ const EventSubmitModal: React.FC<EventSubmitModalProps> = ({ isOpen, onClose }) 
   // ─── Submit Logic ─────────────────────────────────────────────────
 
   const handleSubmit = async () => {
+    if (!form.admission_free && !form.price_adults.trim()) {
+      setError('Adults price is required for paid events.');
+      return;
+    }
     setSubmitting(true);
     setError('');
     try {
+      const adultPrice = !form.admission_free && form.price_adults ? parseFloat(form.price_adults) : null;
+      const kidsPrice = !form.admission_free && form.price_kids ? parseFloat(form.price_kids) : null;
+      const kidsFreeAge = !form.admission_free && form.price_kids_free_under_age ? parseInt(form.price_kids_free_under_age) : null;
+
       const { error: insertError } = await supabase.from('community_events').insert({
         title: form.title.trim(),
         description: form.description.trim() || null,
@@ -244,8 +257,12 @@ const EventSubmitModal: React.FC<EventSubmitModalProps> = ({ isOpen, onClose }) 
         image_url: form.image_url.trim() || null,
         website_url: form.website_url.trim() || null,
         ticket_url: form.ticket_url.trim() || null,
-        is_free: form.is_free,
-        ticket_price: form.is_free ? null : form.ticket_price.trim() || null,
+        is_free: form.admission_free,
+        ticket_price: adultPrice ? String(adultPrice) : null,
+        admission_free: form.admission_free,
+        price_adults: adultPrice,
+        price_kids: kidsPrice,
+        price_kids_free_under_age: kidsFreeAge,
         status: 'pending',
       });
 
@@ -271,6 +288,7 @@ const EventSubmitModal: React.FC<EventSubmitModalProps> = ({ isOpen, onClose }) 
     setPreviewUrl('');
     setUploadedFileName('');
     setIsDragging(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
     onClose();
   };
 
@@ -419,36 +437,67 @@ const EventSubmitModal: React.FC<EventSubmitModalProps> = ({ isOpen, onClose }) 
                 <input type="text" value={form.address} onChange={e => updateField('address', e.target.value)} placeholder="e.g. 6525 W. Inyokern Rd, Inyokern, CA 93527" className={inputCls} />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelCls}>Admission</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => updateField('is_free', true)}
-                      className={`flex-1 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${
-                        form.is_free ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-gray-200 text-gray-500'
-                      }`}
-                    >
-                      Free
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateField('is_free', false)}
-                      className={`flex-1 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${
-                        !form.is_free ? 'border-[#9E065D] bg-[#FEE6F4]/50 text-[#9E065D]' : 'border-gray-200 text-gray-500'
-                      }`}
-                    >
-                      Paid
-                    </button>
-                  </div>
+              {/* Admission pricing */}
+              <div className="border border-gray-100 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    id="admission_free"
+                    type="checkbox"
+                    checked={form.admission_free}
+                    onChange={e => updateField('admission_free', e.target.checked)}
+                    className="accent-emerald-600"
+                  />
+                  <label htmlFor="admission_free" className="text-sm font-semibold text-gray-700 cursor-pointer">
+                    Free Event
+                  </label>
                 </div>
-                {!form.is_free && (
-                  <div>
-                    <label className={labelCls}>Price</label>
-                    <div className="relative">
-                      <DollarSign size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input type="text" value={form.ticket_price} onChange={e => updateField('ticket_price', e.target.value)} placeholder="e.g. $20" className={`${inputCls} pl-9`} />
+
+                {!form.admission_free && (
+                  <div className="space-y-3 pt-1">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={labelCls}>Adults <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                          <DollarSign size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={form.price_adults}
+                            onChange={e => updateField('price_adults', e.target.value)}
+                            placeholder="0.00"
+                            className={`${inputCls} pl-9`}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Kids <span className="text-gray-400 font-normal text-xs">(optional)</span></label>
+                        <div className="relative">
+                          <DollarSign size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={form.price_kids}
+                            onChange={e => updateField('price_kids', e.target.value)}
+                            placeholder="0.00"
+                            className={`${inputCls} pl-9`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-gray-600">Kids under</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="17"
+                        value={form.price_kids_free_under_age}
+                        onChange={e => updateField('price_kids_free_under_age', e.target.value)}
+                        placeholder="—"
+                        className="w-16 px-2 py-1.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#9E065D]/20 focus:border-[#9E065D]"
+                      />
+                      <span className="text-gray-600">are FREE <span className="text-xs text-gray-400">(leave blank if N/A)</span></span>
                     </div>
                   </div>
                 )}
@@ -775,7 +824,17 @@ const EventSubmitModal: React.FC<EventSubmitModalProps> = ({ isOpen, onClose }) 
                     <Ticket size={14} className="text-[#9E065D] mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-semibold text-gray-500 uppercase">Admission</p>
-                      <p className="text-sm text-gray-900">{form.is_free ? 'Free' : form.ticket_price || 'Paid'}</p>
+                      {form.admission_free ? (
+                        <p className="text-sm text-gray-900">Free</p>
+                      ) : (
+                        <div className="space-y-0.5">
+                          {form.price_adults && <p className="text-sm text-gray-900">Adults: ${form.price_adults}</p>}
+                          {form.price_kids && <p className="text-sm text-gray-900">Kids: ${form.price_kids}</p>}
+                          {form.price_kids_free_under_age && (
+                            <p className="text-xs text-emerald-600">Kids under {form.price_kids_free_under_age}: Free</p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-start gap-2.5 bg-white rounded-xl p-3 border border-gray-100">

@@ -43,6 +43,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   'festival': 'Festival',
   'meetup': 'Meetup',
   'swap-meet': 'Swap Meet',
+  'racing': 'Racing Event',
   'other': 'Other',
 };
 

@@ -25,11 +25,16 @@ interface CommunityEvent {
   ticket_url: string | null;
   is_free: boolean;
   ticket_price: string | null;
+  admission_free: boolean | null;
+  price_adults: number | null;
+  price_kids: number | null;
+  price_kids_free_under_age: number | null;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
   'car-show': 'Car Show', 'community': 'Community', 'fundraiser': 'Fundraiser',
-  'festival': 'Festival', 'meetup': 'Meetup', 'swap-meet': 'Swap Meet', 'other': 'Event',
+  'festival': 'Festival', 'meetup': 'Meetup', 'swap-meet': 'Swap Meet',
+  'racing': 'Racing Event', 'other': 'Event',
 };
 
 function formatTime(time: string): string {
@@ -42,6 +47,21 @@ function formatTime(time: string): string {
 function formatEventDate(dateStr: string): string {
   const date = new Date(dateStr + 'T12:00:00');
   return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatAdmission(event: CommunityEvent): React.ReactNode {
+  const free = event.admission_free ?? event.is_free;
+  if (free) return <span className="text-emerald-600 text-xs font-medium">Free</span>;
+
+  const parts: string[] = [];
+  if (event.price_adults) parts.push(`Adults $${event.price_adults}`);
+  if (event.price_kids) parts.push(`Kids $${event.price_kids}`);
+  if (event.price_kids_free_under_age) parts.push(`Under ${event.price_kids_free_under_age} free`);
+
+  if (parts.length === 0 && event.ticket_price) parts.push(event.ticket_price);
+
+  if (parts.length === 0) return <span className="text-gray-500 text-xs">Paid</span>;
+  return <span className="text-gray-600 text-xs">{parts.join(' · ')}</span>;
 }
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -88,6 +108,10 @@ const EventsPage: React.FC = () => {
     ticket_url: null,
     is_free: true,
     ticket_price: null,
+    admission_free: true,
+    price_adults: null,
+    price_kids: null,
+    price_kids_free_under_age: null,
   };
 
   const allEvents = [carShowEvent, ...events];
@@ -240,9 +264,9 @@ const EventsPage: React.FC = () => {
                           <img src={event.image_url} alt={event.title} className="w-24 h-24 rounded-lg object-cover flex-shrink-0 hidden sm:block" />
                         )}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <span className="px-2 py-0.5 bg-[#FEE6F4] text-[#9E065D] text-xs font-semibold rounded-full">{CATEGORY_LABELS[event.category] || 'Event'}</span>
-                            {event.is_free && <span className="text-emerald-600 text-xs font-medium">Free</span>}
+                            {formatAdmission(event)}
                           </div>
                           <h4 className="font-bold text-gray-900 text-lg mb-1 truncate">{event.title}</h4>
                           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
