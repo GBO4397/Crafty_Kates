@@ -2,25 +2,35 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Lock, LogOut, Eye, EyeOff, AlertCircle, Loader2, ChevronLeft,
-  Shield, Calendar, ClipboardList, Download,
-  LayoutDashboard, ChevronRight, Menu, X, Ticket, UserCheck
+  Shield, Calendar, ClipboardList, LayoutDashboard, ChevronRight,
+  Menu, X, Ticket, UserCheck, Users, FileText, Star, Contact
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { checkAdminAuth, adminLogout, generateAdminToken } from '@/components/admin/AdminLoginGate';
+import { useAdminPermissions, AdminPermission } from '@/hooks/useAdminPermissions';
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
 
-// Lazy load admin page content components
 const SponsorAdmin = lazy(() => import('./SponsorAdmin'));
 const EventAdmin = lazy(() => import('./EventAdmin'));
-const DownloadImages = lazy(() => import('./DownloadImages'));
 const OrganizerChecklist = lazy(() => import('./OrganizerChecklist'));
 const RegistrationAdmin = lazy(() => import('./RegistrationAdmin'));
 const CheckInAdmin = lazy(() => import('./CheckInAdmin'));
+const UserManagementAdmin = lazy(() => import('./UserManagementAdmin'));
+const FollowUpPostsAdmin = lazy(() => import('./FollowUpPostsAdmin'));
+const TestimonialsAdmin = lazy(() => import('./TestimonialsAdmin'));
+const OrganizersAdmin = lazy(() => import('./OrganizersAdmin'));
 
-type AdminTool = 'sponsors' | 'events' | 'registrations' | 'checkin' | 'checklist' | 'downloads';
-
-
+type AdminTool =
+  | 'sponsors'
+  | 'events'
+  | 'registrations'
+  | 'checkin'
+  | 'checklist'
+  | 'users'
+  | 'followup'
+  | 'testimonials'
+  | 'organizers';
 
 interface ToolConfig {
   id: AdminTool;
@@ -30,6 +40,7 @@ interface ToolConfig {
   icon: React.ElementType;
   color: string;
   bgColor: string;
+  permission: AdminPermission;
 }
 
 const TOOLS: ToolConfig[] = [
@@ -41,6 +52,7 @@ const TOOLS: ToolConfig[] = [
     icon: Shield,
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
+    permission: 'sponsor_admin',
   },
   {
     id: 'events',
@@ -50,6 +62,7 @@ const TOOLS: ToolConfig[] = [
     icon: Calendar,
     color: 'text-amber-600',
     bgColor: 'bg-amber-50',
+    permission: 'event_admin',
   },
   {
     id: 'registrations',
@@ -59,6 +72,7 @@ const TOOLS: ToolConfig[] = [
     icon: Ticket,
     color: 'text-teal-600',
     bgColor: 'bg-teal-50',
+    permission: 'registrations',
   },
   {
     id: 'checkin',
@@ -68,9 +82,19 @@ const TOOLS: ToolConfig[] = [
     icon: UserCheck,
     color: 'text-orange-600',
     bgColor: 'bg-orange-50',
+    permission: 'checkin',
   },
   {
-
+    id: 'organizers',
+    label: 'Organizers',
+    shortLabel: 'Organizers',
+    description: 'Manage event organizer contacts',
+    icon: Contact,
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-50',
+    permission: 'organizers',
+  },
+  {
     id: 'checklist',
     label: 'Organizer Checklist',
     shortLabel: 'Checklist',
@@ -78,15 +102,37 @@ const TOOLS: ToolConfig[] = [
     icon: ClipboardList,
     color: 'text-green-600',
     bgColor: 'bg-green-50',
+    permission: 'checklist',
   },
   {
-    id: 'downloads',
-    label: 'Download Site Images',
-    shortLabel: 'Downloads',
-    description: 'Archive images for migration',
-    icon: Download,
+    id: 'followup',
+    label: 'Follow-up Posts',
+    shortLabel: 'Follow-ups',
+    description: 'Post-event recaps & highlights',
+    icon: FileText,
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
+    permission: 'follow_up_posts',
+  },
+  {
+    id: 'testimonials',
+    label: 'Testimonials',
+    shortLabel: 'Testimonials',
+    description: 'Manage testimonials by event',
+    icon: Star,
+    color: 'text-yellow-600',
+    bgColor: 'bg-yellow-50',
+    permission: 'testimonials',
+  },
+  {
+    id: 'users',
+    label: 'User Management',
+    shortLabel: 'Users',
+    description: 'Invite admins & assign access',
+    icon: Users,
     color: 'text-rose-600',
     bgColor: 'bg-rose-50',
+    permission: 'user_management',
   },
 ];
 
@@ -148,21 +194,6 @@ const AdminLogin: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated
             <p className="text-white/40 text-sm">Sign in to access all admin tools</p>
           </div>
 
-          {/* Tool Preview Grid */}
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mb-8">
-
-
-            {TOOLS.map(tool => {
-              const Icon = tool.icon;
-              return (
-                <div key={tool.id} className="flex flex-col items-center gap-1.5 p-2 bg-white/5 rounded-xl border border-white/5">
-                  <Icon size={18} className="text-white/40" />
-                  <span className="text-[10px] text-white/30 text-center leading-tight">{tool.shortLabel}</span>
-                </div>
-              );
-            })}
-          </div>
-
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-white/60 mb-2">Admin Password</label>
@@ -212,10 +243,9 @@ const AdminLogin: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated
   );
 };
 
-// ─── Loading Fallback ────────────────────────────────────────────
 const LoadingFallback: React.FC = () => (
   <div className="flex flex-col items-center justify-center py-24 gap-4">
-    <div className="w-10 h-10 border-3 border-[#9E065D] border-t-transparent rounded-full animate-spin" />
+    <div className="w-10 h-10 border-[3px] border-[#9E065D] border-t-transparent rounded-full animate-spin" />
     <p className="text-sm text-gray-500">Loading...</p>
   </div>
 );
@@ -226,6 +256,8 @@ const AdminDashboard: React.FC = () => {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [activeTool, setActiveTool] = useState<AdminTool | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const permissions = useAdminPermissions();
 
   useEffect(() => {
     setIsAuthenticated(checkAdminAuth());
@@ -250,11 +282,12 @@ const AdminDashboard: React.FC = () => {
     return <AdminLogin onAuthenticated={() => setIsAuthenticated(true)} />;
   }
 
-  // If no tool selected, show the tool picker
+  // Determine which tools the user can see
+  const visibleTools = TOOLS.filter(t => permissions.hasPermission(t.permission));
+
   if (!activeTool) {
     return (
       <div className="min-h-screen bg-gray-50/80">
-        {/* Header */}
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -283,44 +316,47 @@ const AdminDashboard: React.FC = () => {
           </div>
         </header>
 
-        {/* Tool Picker */}
         <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">What would you like to work on?</h2>
-            <p className="text-gray-500">Select an admin tool below to get started. You can switch between tools at any time.</p>
+            <p className="text-gray-500">Select an admin tool below to get started.</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {TOOLS.map(tool => {
-              const Icon = tool.icon;
-              return (
-                <button
-                  key={tool.id}
-                  onClick={() => setActiveTool(tool.id)}
-                  className="group relative bg-white rounded-2xl border-2 border-gray-100 hover:border-[#FB50B1]/40 p-6 text-left transition-all duration-300 hover:shadow-lg hover:shadow-[#FB50B1]/5 hover:-translate-y-0.5"
-                >
-                  <div className={`w-12 h-12 ${tool.bgColor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <Icon size={22} className={tool.color} />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#9E065D] transition-colors">{tool.label}</h3>
-                  <p className="text-sm text-gray-500">{tool.description}</p>
-                  <ChevronRight size={18} className="absolute top-6 right-5 text-gray-300 group-hover:text-[#FB50B1] group-hover:translate-x-1 transition-all" />
-                </button>
-              );
-            })}
-          </div>
+          {permissions.loading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={24} className="text-[#9E065D] animate-spin" />
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visibleTools.map(tool => {
+                const Icon = tool.icon;
+                return (
+                  <button
+                    key={tool.id}
+                    onClick={() => setActiveTool(tool.id)}
+                    className="group relative bg-white rounded-2xl border-2 border-gray-100 hover:border-[#FB50B1]/40 p-6 text-left transition-all duration-300 hover:shadow-lg hover:shadow-[#FB50B1]/5 hover:-translate-y-0.5"
+                  >
+                    <div className={`w-12 h-12 ${tool.bgColor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                      <Icon size={22} className={tool.color} />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#9E065D] transition-colors">{tool.label}</h3>
+                    <p className="text-sm text-gray-500">{tool.description}</p>
+                    <ChevronRight size={18} className="absolute top-6 right-5 text-gray-300 group-hover:text-[#FB50B1] group-hover:translate-x-1 transition-all" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </main>
       </div>
     );
   }
 
-  // Active tool view with sidebar
   const activeConfig = TOOLS.find(t => t.id === activeTool)!;
   const ActiveIcon = activeConfig.icon;
 
   return (
     <div className="min-h-screen bg-gray-50/80 flex">
-      {/* Mobile sidebar toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="lg:hidden fixed top-3 left-3 z-[60] w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
@@ -328,14 +364,11 @@ const AdminDashboard: React.FC = () => {
         {sidebarOpen ? <X size={18} className="text-gray-600" /> : <Menu size={18} className="text-gray-600" />}
       </button>
 
-      {/* Sidebar overlay (mobile) */}
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-[55] bg-black/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside className={`fixed lg:sticky top-0 left-0 z-[56] lg:z-auto h-screen w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        {/* Sidebar Header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
           <div className="w-9 h-9 bg-gradient-to-br from-[#9E065D] to-[#FB50B1] rounded-xl flex items-center justify-center flex-shrink-0">
             <LayoutDashboard size={16} className="text-white" />
@@ -346,11 +379,10 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Tool Navigation */}
         <nav className="flex-1 overflow-y-auto py-3 px-3">
           <p className="px-2 mb-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Tools</p>
           <div className="space-y-0.5">
-            {TOOLS.map(tool => {
+            {visibleTools.map(tool => {
               const Icon = tool.icon;
               const isActive = activeTool === tool.id;
               return (
@@ -378,7 +410,6 @@ const AdminDashboard: React.FC = () => {
           </div>
         </nav>
 
-        {/* Sidebar Footer */}
         <div className="border-t border-gray-100 px-3 py-3 space-y-1">
           <Link
             to="/"
@@ -397,9 +428,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 min-w-0 min-h-screen">
-        {/* Top bar with current tool info (mobile-friendly) */}
         <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm lg:hidden">
           <div className="flex items-center gap-3 px-4 py-3 pl-14">
             <div className={`w-8 h-8 ${activeConfig.bgColor} rounded-lg flex items-center justify-center flex-shrink-0`}>
@@ -419,10 +448,12 @@ const AdminDashboard: React.FC = () => {
             {activeTool === 'registrations' && <RegistrationAdmin embedded />}
             {activeTool === 'checkin' && <CheckInAdmin embedded />}
             {activeTool === 'checklist' && <OrganizerChecklist embedded />}
-            {activeTool === 'downloads' && <DownloadImages embedded />}
+            {activeTool === 'users' && <UserManagementAdmin embedded />}
+            {activeTool === 'followup' && <FollowUpPostsAdmin embedded />}
+            {activeTool === 'testimonials' && <TestimonialsAdmin embedded />}
+            {activeTool === 'organizers' && <OrganizersAdmin embedded />}
           </div>
         </Suspense>
-
       </main>
     </div>
   );
