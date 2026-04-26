@@ -10,6 +10,12 @@ export default {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
+  safelist: [
+    // Explicitly include responsive padding/margin variants to prevent purging
+    { pattern: /^(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
+    { pattern: /^sm:(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
+    { pattern: /^lg:(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
+  ],
   prefix: "",
   theme: {
     container: {
