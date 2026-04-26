@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { X, Upload, Plus, Trash2, GripVertical, BookOpen, ArrowRight, ArrowLeft, Check, Image as ImageIcon, FileText, Info, Loader2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, Upload, Trash2, BookOpen, ArrowRight, ArrowLeft, Check, Image as ImageIcon, Info, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface ColoringBookSubmitModalProps {
@@ -21,6 +21,7 @@ const ColoringBookSubmitModal: React.FC<ColoringBookSubmitModalProps> = ({ isOpe
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Step 1: Book info
   const [title, setTitle] = useState('');
@@ -58,6 +59,7 @@ const ColoringBookSubmitModal: React.FC<ColoringBookSubmitModalProps> = ({ isOpe
     setPages([]);
     setSubmitting(false);
     setSubmitted(false);
+    setSubmitError('');
   };
 
   const handleClose = () => {
@@ -66,27 +68,17 @@ const ColoringBookSubmitModal: React.FC<ColoringBookSubmitModalProps> = ({ isOpe
   };
 
   const uploadImage = async (file: File, bookId: string = 'temp'): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const { data, error } = await supabase.functions.invoke('upload-coloring-page', {
-            body: {
-              fileData: reader.result as string,
-              fileName: file.name,
-              contentType: file.type,
-              bookId,
-            },
-          });
-          if (error) throw error;
-          resolve(data.url);
-        } catch (err: any) {
-          reject(err);
-        }
-      };
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsDataURL(file);
-    });
+    const ext = file.name.split('.').pop() ?? 'jpg';
+    const path = `${bookId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+    const { error: upErr } = await supabase.storage
+      .from('coloring-books')
+      .upload(path, file, { contentType: file.type, upsert: false });
+
+    if (upErr) throw new Error(`Image upload failed: ${upErr.message}`);
+
+    const { data: urlData } = supabase.storage.from('coloring-books').getPublicUrl(path);
+    return urlData.publicUrl;
   };
 
   const handleCoverUpload = (
@@ -170,6 +162,7 @@ const ColoringBookSubmitModal: React.FC<ColoringBookSubmitModalProps> = ({ isOpe
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setSubmitError('');
     try {
       // 1. Create the book record
       const { data: bookData, error: bookError } = await supabase
@@ -235,9 +228,8 @@ const ColoringBookSubmitModal: React.FC<ColoringBookSubmitModalProps> = ({ isOpe
       }
 
       setSubmitted(true);
-    } catch (err) {
-      console.error('Submit error:', err);
-      alert('There was an error submitting your coloring book. Please try again.');
+    } catch (err: any) {
+      setSubmitError(err.message || 'There was an error submitting your coloring book. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -594,6 +586,13 @@ const ColoringBookSubmitModal: React.FC<ColoringBookSubmitModalProps> = ({ isOpe
                   <strong>Note:</strong> Your coloring book will be reviewed by our team before being published. You'll receive an email notification at <strong>{email}</strong> once approved.
                 </p>
               </div>
+
+              {submitError && (
+                <div className="flex items-start gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
+                  <AlertCircle size={14} className="text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-red-700 text-sm">{submitError}</p>
+                </div>
+              )}
             </div>
           )}
 
