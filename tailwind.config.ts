@@ -11,10 +11,12 @@ export default {
     "./src/**/*.{ts,tsx}",
   ],
   safelist: [
-    // Explicitly include responsive padding/margin variants to prevent purging
+    // Explicitly include spacing and container utilities to prevent purging
     { pattern: /^(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
     { pattern: /^sm:(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
     { pattern: /^lg:(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
+    { pattern: /^max-w-(xs|sm|md|lg|xl|2xl|3xl|4xl|7xl|full)$/ },
+    { pattern: /^(w-full|mx-auto)$/ },
   ],
   prefix: "",
   theme: {
