@@ -31,3 +31,6 @@ dist-ssr
 # Windows system files
 desktop.ini
 Thumbs.db
+
+# Claude Code internal files
+.claude/worktrees/
