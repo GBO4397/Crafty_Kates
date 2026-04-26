@@ -10,7 +10,8 @@ export type AdminPermission =
   | 'checklist'
   | 'follow_up_posts'
   | 'testimonials'
-  | 'user_management';
+  | 'user_management'
+  | 'coloring_book_admin';
 
 interface AdminPermissions {
   permissions: Set<AdminPermission>;
@@ -38,7 +39,7 @@ export function useAdminPermissions(): AdminPermissions {
       const ALL_PERMISSIONS: AdminPermission[] = [
         'sponsor_admin', 'event_admin', 'registrations', 'checkin',
         'organizers', 'checklist', 'follow_up_posts', 'testimonials',
-        'user_management',
+        'user_management', 'coloring_book_admin',
       ];
 
       try {

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Lock, LogOut, Eye, EyeOff, AlertCircle, Loader2, ChevronLeft,
   Shield, Calendar, ClipboardList, LayoutDashboard, ChevronRight,
-  Menu, X, Ticket, UserCheck, Users, FileText, Star, Contact
+  Menu, X, Ticket, UserCheck, Users, FileText, Star, Contact, BookOpen
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { checkAdminAuth, adminLogout, generateAdminToken } from '@/components/admin/AdminLoginGate';
@@ -20,6 +20,7 @@ const UserManagementAdmin = lazy(() => import('./UserManagementAdmin'));
 const FollowUpPostsAdmin = lazy(() => import('./FollowUpPostsAdmin'));
 const TestimonialsAdmin = lazy(() => import('./TestimonialsAdmin'));
 const OrganizersAdmin = lazy(() => import('./OrganizersAdmin'));
+const ColoringBookAdmin = lazy(() => import('./ColoringBookAdmin'));
 
 type AdminTool =
   | 'sponsors'
@@ -30,7 +31,8 @@ type AdminTool =
   | 'users'
   | 'followup'
   | 'testimonials'
-  | 'organizers';
+  | 'organizers'
+  | 'coloringbooks';
 
 interface ToolConfig {
   id: AdminTool;
@@ -133,6 +135,16 @@ const TOOLS: ToolConfig[] = [
     color: 'text-rose-600',
     bgColor: 'bg-rose-50',
     permission: 'user_management',
+  },
+  {
+    id: 'coloringbooks',
+    label: 'Coloring Books',
+    shortLabel: 'Coloring',
+    description: 'Review & approve submissions',
+    icon: BookOpen,
+    color: 'text-pink-600',
+    bgColor: 'bg-pink-50',
+    permission: 'coloring_book_admin',
   },
 ];
 
@@ -452,6 +464,7 @@ const AdminDashboard: React.FC = () => {
             {activeTool === 'followup' && <FollowUpPostsAdmin embedded />}
             {activeTool === 'testimonials' && <TestimonialsAdmin embedded />}
             {activeTool === 'organizers' && <OrganizersAdmin embedded />}
+            {activeTool === 'coloringbooks' && <ColoringBookAdmin embedded />}
           </div>
         </Suspense>
       </main>
