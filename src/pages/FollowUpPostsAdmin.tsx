@@ -23,7 +23,6 @@ interface FollowUpPost {
   status: 'draft' | 'published';
   publish_date: string;
   created_at: string;
-  community_events?: { title: string } | null;
 }
 
 interface FormData {
@@ -68,7 +67,7 @@ const FollowUpPostsAdmin: React.FC<FollowUpPostsAdminProps> = ({ embedded }) => 
     setError('');
     try {
       const [postsRes, eventsRes] = await Promise.all([
-        supabase.from('event_followup_posts').select('*, community_events(title)').order('created_at', { ascending: false }),
+        supabase.from('event_followup_posts').select('*').order('created_at', { ascending: false }),
         supabase.from('community_events').select('id, title, event_date').eq('status', 'approved').order('event_date', { ascending: false }),
       ]);
       if (postsRes.error) throw postsRes.error;
@@ -311,9 +310,9 @@ const FollowUpPostsAdmin: React.FC<FollowUpPostsAdminProps> = ({ embedded }) => 
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">{post.title}</p>
                     <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                      {post.community_events?.title && (
+                      {post.event_id && events.find(e => e.id === post.event_id) && (
                         <span className="text-xs text-gray-500 flex items-center gap-1">
-                          <Calendar size={10} /> {post.community_events.title}
+                          <Calendar size={10} /> {events.find(e => e.id === post.event_id)!.title}
                         </span>
                       )}
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${

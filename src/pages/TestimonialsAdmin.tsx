@@ -24,7 +24,6 @@ interface Testimonial {
   star_rating: number | null;
   status: 'draft' | 'published';
   created_at: string;
-  community_events?: { title: string } | null;
 }
 
 interface FormData {
@@ -72,7 +71,7 @@ const TestimonialsAdmin: React.FC<TestimonialsAdminProps> = ({ embedded }) => {
     setError('');
     try {
       const [tRes, evRes] = await Promise.all([
-        supabase.from('testimonials').select('*, community_events(title)').order('created_at', { ascending: false }),
+        supabase.from('testimonials').select('*').order('created_at', { ascending: false }),
         supabase.from('community_events').select('id, title, event_date').eq('status', 'approved').order('event_date', { ascending: false }),
       ]);
       if (tRes.error) throw tRes.error;
@@ -320,7 +319,7 @@ const TestimonialsAdmin: React.FC<TestimonialsAdminProps> = ({ embedded }) => {
                       }`}>{t.status}</span>
                     </div>
                     <p className="text-xs text-gray-500 truncate mt-0.5">{t.testimonial_text}</p>
-                    {t.community_events?.title && <p className="text-[10px] text-gray-400 mt-0.5">{t.community_events.title}</p>}
+                    {t.event_id && events.find(e => e.id === t.event_id) && <p className="text-[10px] text-gray-400 mt-0.5">{events.find(e => e.id === t.event_id)!.title}</p>}
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button onClick={() => startEdit(t)} className="p-1.5 text-gray-400 hover:text-[#9E065D] hover:bg-[#FEE6F4]/30 rounded-lg transition-colors">
