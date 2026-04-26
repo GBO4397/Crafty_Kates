@@ -18,6 +18,9 @@ interface ColoringBook {
   status: 'pending' | 'approved' | 'rejected';
   tags: string[] | null;
   cover_image: string | null;
+  back_cover_image: string | null;
+  inside_front_cover: string | null;
+  inside_back_cover: string | null;
   created_at: string;
 }
 
@@ -306,6 +309,36 @@ const ColoringBookAdmin: React.FC<ColoringBookAdminProps> = ({ embedded }) => {
                       </div>
                     ) : (
                       <div>
+                        {/* Cover images */}
+                        {[
+                          { url: book.cover_image, label: 'Front Cover' },
+                          { url: book.back_cover_image, label: 'Back Cover' },
+                          { url: book.inside_front_cover, label: 'Inside Front' },
+                          { url: book.inside_back_cover, label: 'Inside Back' },
+                        ].some(c => c.url) && (
+                          <div className="mb-5">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Covers</p>
+                            <div className="flex flex-wrap gap-3">
+                              {[
+                                { url: book.cover_image, label: 'Front Cover' },
+                                { url: book.back_cover_image, label: 'Back Cover' },
+                                { url: book.inside_front_cover, label: 'Inside Front' },
+                                { url: book.inside_back_cover, label: 'Inside Back' },
+                              ].filter(c => c.url).map(cover => (
+                                <div key={cover.label} className="flex-shrink-0 text-center">
+                                  <img
+                                    src={cover.url!}
+                                    alt={cover.label}
+                                    className="w-20 h-28 object-cover rounded-lg border border-gray-200 shadow-sm"
+                                  />
+                                  <p className="text-[10px] text-gray-400 mt-1">{cover.label}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Coloring pages */}
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">
                           Pages ({pages[book.id]?.length ?? 0})
                         </p>
