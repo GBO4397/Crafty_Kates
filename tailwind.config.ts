@@ -11,12 +11,17 @@ export default {
     "./src/**/*.{ts,tsx}",
   ],
   safelist: [
-    // Explicitly include spacing and container utilities to prevent purging
-    { pattern: /^(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
-    { pattern: /^sm:(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
-    { pattern: /^lg:(p[xy]|m[xy])-(4|6|8|16|20|24)$/ },
-    { pattern: /^max-w-(xs|sm|md|lg|xl|2xl|3xl|4xl|7xl|full)$/ },
-    { pattern: /^(w-full|mx-auto)$/ },
+    // Explicit container widths
+    'max-w-7xl', 'max-w-3xl', 'max-w-5xl', 'max-w-4xl', 'max-w-2xl', 'max-w-xl', 'max-w-lg', 'max-w-full',
+    'mx-auto', 'w-full',
+    // Explicit responsive padding — the critical layout classes
+    'px-4', 'py-16',
+    'sm:px-6', 'sm:py-20',
+    'lg:px-8', 'lg:py-24',
+    // Pattern-based safelist — correct Tailwind v3 format:
+    // `pattern` matches base class names; `variants` generates the responsive prefixed versions
+    { pattern: /^(px|py|mx|my|p|m)-(0|2|4|6|8|10|12|16|20|24|32|40|48)$/, variants: ['sm', 'md', 'lg', 'xl'] },
+    { pattern: /^max-w-(xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|full|none)$/, variants: ['sm', 'md', 'lg', 'xl'] },
   ],
   prefix: "",
   theme: {
