@@ -9,6 +9,7 @@ import PostsSection from '@/components/crafty/PostsSection';
 import ColoringBookSection from '@/components/crafty/ColoringBookSection';
 import NostalgiaSection from '@/components/crafty/NostalgiaSection';
 import CommunitySection from '@/components/crafty/CommunitySection';
+import TestimonialsSection from '@/components/crafty/TestimonialsSection';
 import SponsorSection from '@/components/crafty/SponsorSection';
 import ContactSection from '@/components/crafty/ContactSection';
 import Footer from '@/components/crafty/Footer';
@@ -26,6 +27,7 @@ const AppLayout: React.FC = () => {
       <EventsSection />
       <NostalgiaSection />
       <CommunitySection />
+      <TestimonialsSection />
       <SponsorSection />
       <ContactSection />
       <Footer />
