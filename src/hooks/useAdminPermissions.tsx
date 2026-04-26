@@ -35,21 +35,24 @@ export function useAdminPermissions(): AdminPermissions {
     let cancelled = false;
 
     async function load() {
+      const ALL_PERMISSIONS: AdminPermission[] = [
+        'sponsor_admin', 'event_admin', 'registrations', 'checkin',
+        'organizers', 'checklist', 'follow_up_posts', 'testimonials',
+        'user_management',
+      ];
+
       try {
         const { data, error } = await supabase.rpc('get_my_admin_permissions');
-        if (!cancelled && !error && data) {
-          setPermissions(new Set(data as AdminPermission[]));
+        if (!cancelled) {
+          if (!error && Array.isArray(data) && data.length > 0) {
+            setPermissions(new Set(data as AdminPermission[]));
+          } else {
+            // No Supabase auth session (single-password admin) — grant all permissions.
+            setPermissions(new Set(ALL_PERMISSIONS));
+          }
         }
       } catch {
-        // Supabase not authenticated or function unavailable — grant all permissions
-        // to maintain backward compatibility with the single-password auth system.
-        if (!cancelled) {
-          setPermissions(new Set([
-            'sponsor_admin', 'event_admin', 'registrations', 'checkin',
-            'organizers', 'checklist', 'follow_up_posts', 'testimonials',
-            'user_management',
-          ]));
-        }
+        if (!cancelled) setPermissions(new Set(ALL_PERMISSIONS));
       } finally {
         if (!cancelled) setLoading(false);
       }
