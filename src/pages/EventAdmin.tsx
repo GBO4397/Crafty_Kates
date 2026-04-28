@@ -6,7 +6,7 @@ import {
   CheckCircle, AlertCircle, Loader2, X, Lock, LogOut, Eye, EyeOff,
   User, Mail, Phone, Globe, Ticket, DollarSign, Tag,
   ThumbsUp, ThumbsDown, Trash2, MessageSquare, ExternalLink,
-  Filter, Search, Image as ImageIcon
+  Filter, Search, Image as ImageIcon, Check
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -162,6 +162,8 @@ const EventAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [eventTimes, setEventTimes] = useState<Record<string, { start: string; end: string }>>({});
+  const [timeSaving, setTimeSaving] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -235,6 +237,29 @@ const EventAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
       toast({ title: 'Update Failed', description: err.message, variant: 'destructive' });
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleTimeUpdate = async (id: string) => {
+    const times = eventTimes[id];
+    if (!times) return;
+    setTimeSaving(id);
+    try {
+      const { error } = await supabase
+        .from('community_events')
+        .update({
+          event_time_start: times.start || null,
+          event_time_end: times.end || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+      if (error) throw error;
+      setEvents(prev => prev.map(e => e.id === id ? { ...e, event_time_start: times.start || null, event_time_end: times.end || null } : e));
+      toast({ title: 'Time Saved', description: 'Event times updated successfully.' });
+    } catch (err: any) {
+      toast({ title: 'Save Failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setTimeSaving(null);
     }
   };
 
@@ -448,7 +473,13 @@ const EventAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
                     {/* Summary Row */}
                     <div
                       className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/50 transition-colors rounded-2xl"
-                      onClick={() => setExpandedEvent(isExpanded ? null : event.id)}
+                      onClick={() => {
+                        const next = isExpanded ? null : event.id;
+                        setExpandedEvent(next);
+                        if (next && !eventTimes[next]) {
+                          setEventTimes(prev => ({ ...prev, [next]: { start: event.event_time_start || '', end: event.event_time_end || '' } }));
+                        }
+                      }}
                     >
                       {/* Date badge */}
                       <div className="flex-shrink-0 w-14 h-14 bg-[#FEE6F4]/50 rounded-xl flex flex-col items-center justify-center">
@@ -549,19 +580,35 @@ const EventAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
                                   <p className="text-gray-900">{new Date(event.event_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                 </div>
                               </div>
-                              {(event.event_time_start || event.event_time_end) && (
-                                <div className="flex items-start gap-2 text-sm">
-                                  <Clock size={14} className="text-[#9E065D] mt-0.5 flex-shrink-0" />
-                                  <div>
-                                    <p className="text-xs text-gray-400 font-medium">Time</p>
-                                    <p className="text-gray-900">
-                                      {event.event_time_start && formatTime(event.event_time_start)}
-                                      {event.event_time_start && event.event_time_end && ' – '}
-                                      {event.event_time_end && formatTime(event.event_time_end)}
-                                    </p>
+                              <div className="flex items-start gap-2 text-sm">
+                                <Clock size={14} className="text-[#9E065D] mt-0.5 flex-shrink-0" />
+                                <div className="flex-1">
+                                  <p className="text-xs text-gray-400 font-medium mb-1">Time</p>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <input
+                                      type="time"
+                                      value={eventTimes[event.id]?.start ?? event.event_time_start ?? ''}
+                                      onChange={e => setEventTimes(prev => ({ ...prev, [event.id]: { ...prev[event.id], start: e.target.value } }))}
+                                      className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#9E065D]/20 focus:border-[#9E065D]"
+                                    />
+                                    <span className="text-gray-400 text-xs">to</span>
+                                    <input
+                                      type="time"
+                                      value={eventTimes[event.id]?.end ?? event.event_time_end ?? ''}
+                                      onChange={e => setEventTimes(prev => ({ ...prev, [event.id]: { ...prev[event.id], end: e.target.value } }))}
+                                      className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#9E065D]/20 focus:border-[#9E065D]"
+                                    />
+                                    <button
+                                      onClick={() => handleTimeUpdate(event.id)}
+                                      disabled={timeSaving === event.id}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#9E065D] hover:bg-[#FB50B1] text-white rounded-lg text-xs transition-colors disabled:opacity-50"
+                                    >
+                                      {timeSaving === event.id ? <Loader2 size={11} className="animate-spin" /> : <Check size={11} />}
+                                      Save
+                                    </button>
                                   </div>
                                 </div>
-                              )}
+                              </div>
                               <div className="flex items-start gap-2 text-sm">
                                 <MapPin size={14} className="text-[#9E065D] mt-0.5 flex-shrink-0" />
                                 <div>
