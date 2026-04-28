@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import {
   Calendar, MapPin, Clock, Users, ChevronRight, Ticket, ExternalLink,
-  Plus, Tag, Globe, DollarSign, ArrowRight
+  Plus, Tag, Globe, DollarSign, ArrowRight, X, ZoomIn
 } from 'lucide-react';
 import { useSiteImages } from '@/contexts/SiteImagesContext';
 import EventSubmitModal from './EventSubmitModal';
@@ -262,13 +262,41 @@ const CommunityEventCard: React.FC<{ event: CommunityEvent }> = ({ event }) => {
   const categoryLabel = CATEGORY_LABELS[event.category] || 'Event';
   const shortDate = formatShortDate(event.event_date);
   const fullDate = formatEventDate(event.event_date);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   return (
+    <>
+      {lightboxOpen && event.image_url && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/80 rounded-full p-2 transition-colors"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Close"
+          >
+            <X size={24} />
+          </button>
+          <img
+            src={event.image_url}
+            alt={event.title}
+            className="max-h-[90vh] max-w-[90vw] rounded-xl shadow-2xl object-contain"
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
+
     <div className="group bg-white rounded-2xl border border-gray-100 hover:border-[#FEE6F4] hover:shadow-xl transition-all duration-300 overflow-hidden">
       {event.image_url ? (
-        <div className="relative h-40 overflow-hidden">
-          <img src={event.image_url} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        <div
+          className="relative h-48 bg-gray-100 overflow-hidden cursor-zoom-in"
+          onClick={() => setLightboxOpen(true)}
+        >
+          <img src={event.image_url} alt={event.title} className="w-full h-full object-contain" />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+            <ZoomIn size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg" />
+          </div>
           <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#9E065D] px-3 py-1 rounded-lg text-xs font-bold">{shortDate}</div>
           <div className="absolute top-3 right-3 bg-[#9E065D]/90 text-white px-2.5 py-1 rounded-lg text-xs font-medium">{categoryLabel}</div>
         </div>
@@ -312,6 +340,7 @@ const CommunityEventCard: React.FC<{ event: CommunityEvent }> = ({ event }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
