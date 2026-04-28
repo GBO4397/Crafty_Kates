@@ -213,17 +213,18 @@ const EventAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
   const handleStatusChange = async (id: string, newStatus: 'approved' | 'rejected') => {
     setActionLoading(id);
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError, count } = await supabase
         .from('community_events')
         .update({
           status: newStatus,
           admin_notes: adminNotes[id] || null,
           reviewed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        })
+        }, { count: 'exact' })
         .eq('id', id);
 
       if (updateError) throw updateError;
+      if (!count || count === 0) throw new Error('Update was blocked by database permissions. Apply the Supabase RLS migration and try again.');
 
       setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus, admin_notes: adminNotes[id] || null, reviewed_at: new Date().toISOString() } : e));
       toast({
@@ -231,7 +232,7 @@ const EventAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
         description: `The event has been ${newStatus}. ${newStatus === 'approved' ? 'It will now appear on the website.' : ''}`,
       });
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast({ title: 'Update Failed', description: err.message, variant: 'destructive' });
     } finally {
       setActionLoading(null);
     }
@@ -241,12 +242,24 @@ const EventAdmin: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
     if (!confirm('Are you sure you want to permanently delete this event submission?')) return;
     setActionLoading(id);
     try {
-      const { error: deleteError } = await supabase.from('community_events').delete().eq('id', id);
+      const { error: deleteError, count } = await supabase
+        .from('community_events')
+        .delete({ count: 'exact' })
+        .eq('id', id);
+
       if (deleteError) throw deleteError;
+      if (!count || count === 0) throw new Error('Delete was blocked by database permissions. Apply the Supabase RLS migration and try again.');
+
       setEvents(prev => prev.filter(e => e.id !== id));
-      toast({ title: 'Deleted', description: 'Event submission has been removed.' });
+      if (expandedEvent === id) setExpandedEvent(null);
+      toast({ title: 'Deleted', description: 'Event submission has been permanently removed.' });
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      console.error('Delete failed:', err);
+      toast({
+        title: 'Delete Failed',
+        description: err.message || 'Could not delete event. Check Supabase permissions.',
+        variant: 'destructive',
+      });
     } finally {
       setActionLoading(null);
     }
