@@ -6,6 +6,8 @@
 **Live Site:** https://craftykates.com  
 **Status:** ✅ Live and operational (April 2026)
 
+**Stack: B** (see global CLAUDE.md — WordPress, Etch WP, ACSS Ver 4+, WS Forms Pro, ACF). This applies to the planned rebuild/remake; the currently live site documented below is React/Vite/Supabase and is maintained as-is until the migration.
+
 ---
 
 ## Tech Stack
