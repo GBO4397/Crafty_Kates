@@ -1,0 +1,99 @@
+/* Crafty Kates semantic layer. ACSS 4 supplies palette, type, spacing, grids and contextual utilities. */
+:root {
+  --ck-shadow: 0 1.4rem 3.5rem color-mix(in srgb, var(--base, #1a0a12) 14%, transparent);
+  --ck-radius: var(--radius, 1.15rem);
+  --ck-line: color-mix(in srgb, var(--neutral, #75656d) 22%, transparent);
+}
+
+.ck-display {
+  font-family: var(--heading-font-family, "Bebas Neue", Impact, sans-serif);
+  font-weight: 400;
+  letter-spacing: .025em;
+  line-height: .92;
+  text-wrap: balance;
+}
+
+.ck-eyebrow {
+  color: var(--primary, #9e065d);
+  font-size: var(--text-s, .78rem);
+  font-weight: 900;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.ck-section-intro { max-width: 48rem; }
+.ck-section-intro > * + * { margin-block-start: var(--space-s); }
+.ck-section-intro--center { margin-inline: auto; text-align: center; }
+
+.ck-hero {
+  min-height: min(52rem, 92vh);
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+.ck-hero__media,
+.ck-hero__shade { position: absolute; inset: 0; }
+.ck-hero__media { z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.ck-hero__shade {
+  z-index: -1;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--base-ultra-dark, #1a0a12) 94%, transparent), color-mix(in srgb, var(--base-ultra-dark, #1a0a12) 32%, transparent));
+}
+.ck-hero__content { max-width: 46rem; padding-block: var(--section-space-xl-to-m); }
+.ck-hero__title { font-size: clamp(4.5rem, 11vw, 10rem); margin-block: var(--space-xs) var(--space-m); }
+.ck-hero__title span { color: var(--secondary, #fb50b1); display: block; }
+.ck-hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-s); }
+
+.ck-split { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: var(--space-xl); align-items: center; }
+.ck-split--reverse { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+.ck-split__media { border-radius: var(--ck-radius); box-shadow: var(--ck-shadow); overflow: hidden; }
+.ck-split__media img { width: 100%; max-height: 42rem; object-fit: cover; }
+
+.ck-card {
+  background: var(--white, #fff);
+  border: 1px solid var(--ck-line);
+  border-radius: var(--ck-radius);
+  box-shadow: 0 .75rem 2rem color-mix(in srgb, var(--base, #1a0a12) 7%, transparent);
+  overflow: hidden;
+}
+.ck-card__media { aspect-ratio: 4 / 3; width: 100%; object-fit: cover; }
+.ck-card__body { padding: var(--space-m); }
+.ck-card__body > * + * { margin-block-start: var(--space-s); }
+
+.ck-sponsor-card { display: grid; min-height: 15rem; place-items: center; padding: var(--space-m); text-align: center; }
+.ck-sponsor-card img { width: 100%; height: 7rem; object-fit: contain; }
+.ck-sponsor-card[data-tier="gold"] { border-block-start: .3rem solid #c3952e; }
+.ck-sponsor-card[data-tier="silver"] { border-block-start: .3rem solid #9aa1aa; }
+.ck-sponsor-card[data-tier="bronze"] { border-block-start: .3rem solid #a9673f; }
+
+.ck-event-card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-m); padding: var(--space-m); }
+.ck-event-date { min-width: 7rem; padding: var(--space-s); border-radius: var(--ck-radius); text-align: center; }
+.ck-event-date > * { display: block; }
+
+.ck-gallery-grid img { width: 100%; aspect-ratio: 4 / 3; border-radius: calc(var(--ck-radius) / 1.4); object-fit: cover; }
+.ck-book-page { background: var(--white, #fff); box-shadow: var(--ck-shadow); max-height: 75vh; margin-inline: auto; object-fit: contain; }
+
+.ck-form-shell { max-width: 58rem; margin-inline: auto; }
+.ck-form-shell .wsf-form { --wsf-grid-gap: var(--space-m); }
+
+.ck-site-header { position: sticky; top: 0; z-index: 50; border-block-end: 1px solid var(--ck-line); backdrop-filter: blur(1rem); }
+.ck-site-header__inner { min-height: 5rem; display: flex; align-items: center; justify-content: space-between; gap: var(--space-m); }
+.ck-site-header__brand { display: flex; align-items: center; gap: var(--space-s); }
+.ck-site-header__brand img { width: 3.5rem; height: 3.5rem; border-radius: 50%; object-fit: cover; }
+.ck-site-footer { padding-block: var(--section-space-m) var(--space-m); }
+.ck-site-footer__grid { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr)); gap: var(--space-xl); }
+.ck-site-footer__bottom { display: flex; justify-content: space-between; gap: var(--space-m); border-block-start: 1px solid color-mix(in srgb, currentColor 18%, transparent); margin-block-start: var(--space-xl); padding-block-start: var(--space-m); }
+
+.ck-legal { max-width: 52rem; }
+.ck-legal > * + * { margin-block-start: var(--space-m); }
+
+@media (max-width: 52rem) {
+  .ck-split,
+  .ck-split--reverse,
+  .ck-site-footer__grid { grid-template-columns: 1fr; }
+  .ck-event-card { grid-template-columns: 1fr; }
+  .ck-site-footer__bottom { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

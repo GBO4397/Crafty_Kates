@@ -1,0 +1,16 @@
+<!-- Convert each top-level article into its own named Etch component. -->
+<article class="ck-card">
+  <etch:img class="ck-card__media" mediaId="{props.mediaId}" useSrcSet="true" />
+  <div class="ck-card__body"><p class="ck-eyebrow">{props.eyebrow}</p><h3 class="ck-display">{props.title}</h3><p>{props.summary}</p><a class="btn--primary" href="{props.url}">{props.linkLabel}</a></div>
+</article>
+
+<article class="ck-card ck-event-card">
+  <time class="ck-event-date bg--primary text--light" datetime="{props.machineDate}"><strong>{props.month}</strong><span class="ck-display">{props.day}</span></time>
+  <div><p class="ck-eyebrow">{props.category}</p><h3 class="ck-display">{props.title}</h3><p>{props.location}</p><a href="{props.url}" aria-label="View event: {props.title}">Event details</a></div>
+</article>
+
+<article class="ck-card ck-sponsor-card" data-tier="{props.tier}">
+  <etch:img mediaId="{props.logoMediaId}" useSrcSet="true" />
+  <strong>{props.name}</strong>
+  <a href="{props.url}" aria-label="Visit {props.name}">Visit sponsor</a>
+</article>

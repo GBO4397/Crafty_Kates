@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "note": "Implementation specification, not a WS Form export. Create in WS Form PRO, test, then save the official exports in exports/.",
+  "forms": {
+    "contact": {
+      "fields": ["name|required", "email|required|email", "subject|required", "message|required|textarea", "consent|required|checkbox"],
+      "actions": ["save_submission", "email_site_owner", "show_success_message"],
+      "spam": ["honeypot", "turnstile_or_recaptcha"]
+    },
+    "newsletter": {
+      "fields": ["email|required|email", "consent|required|checkbox"],
+      "actions": ["save_submission", "show_success_message"],
+      "spam": ["honeypot"]
+    },
+    "registration": {
+      "fields": ["name|required", "email|required|email", "phone|required", "address|required", "city|required", "state|required", "postal_code|required", "entry_type|required|radio:vehicle,vendor,cackle", "vehicle_year|conditional:vehicle", "vehicle_make|conditional:vehicle", "vehicle_model|conditional:vehicle", "vendor_name|conditional:vendor", "vendor_space_size|conditional:vendor", "cackle_car_info|conditional:cackle|textarea", "liability_agreed|required|checkbox", "photo_release|required|checkbox"],
+      "actions": ["save_submission", "run_action:ckp_wsform_registration", "email_confirmation", "email_organizer", "show_success_message"],
+      "spam": ["honeypot", "turnstile_or_recaptcha"]
+    },
+    "story": {
+      "fields": ["title|required", "subtitle", "author_name|required", "author_email|required|email", "category", "summary|required|textarea", "content|required|textarea", "featured_image|image|max_10mb", "tags", "source_url|url", "consent|required|checkbox"],
+      "actions": ["post_management:post:draft", "email_organizer", "show_success_message"],
+      "spam": ["honeypot", "turnstile_or_recaptcha"]
+    },
+    "event": {
+      "fields": ["title|required", "description|required|textarea", "event_date|required|date", "event_time_start|time", "event_time_end|time", "location|required", "address", "category|required", "organizer_name|required", "organizer_email|required|email", "organizer_phone", "image|image|max_10mb", "website_url|url", "ticket_url|url", "is_free|checkbox", "ticket_price", "consent|required|checkbox"],
+      "actions": ["post_management:ck_event:draft:review_status=pending", "email_organizer", "show_success_message"],
+      "spam": ["honeypot", "turnstile_or_recaptcha"]
+    },
+    "coloring_book": {
+      "fields": ["title|required", "author|required", "contact_email|required|email", "description|required|textarea", "cover_image|required|image|max_10mb", "back_cover_image|image|max_10mb", "inside_front_cover|image|max_10mb", "inside_back_cover|image|max_10mb", "pages|required|repeatable|image|max_10mb", "tags", "consent|required|checkbox"],
+      "actions": ["post_management:ck_color_book:draft:review_status=pending", "email_organizer", "show_success_message"],
+      "spam": ["honeypot", "turnstile_or_recaptcha"]
+    }
+  }
+}

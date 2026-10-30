@@ -1,0 +1,18 @@
+{
+  "name": "REPLACE_FIELD_ID",
+  "email": "REPLACE_FIELD_ID",
+  "phone": "REPLACE_FIELD_ID",
+  "address": "REPLACE_FIELD_ID",
+  "city": "REPLACE_FIELD_ID",
+  "state": "REPLACE_FIELD_ID",
+  "postal_code": "REPLACE_FIELD_ID",
+  "entry_type": "REPLACE_FIELD_ID",
+  "vehicle_year": "REPLACE_FIELD_ID",
+  "vehicle_make": "REPLACE_FIELD_ID",
+  "vehicle_model": "REPLACE_FIELD_ID",
+  "vendor_name": "REPLACE_FIELD_ID",
+  "vendor_space_size": "REPLACE_FIELD_ID",
+  "cackle_car_info": "REPLACE_FIELD_ID",
+  "liability_agreed": "REPLACE_FIELD_ID",
+  "photo_release": "REPLACE_FIELD_ID"
+}

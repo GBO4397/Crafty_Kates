@@ -40,7 +40,7 @@
 - `registrations` — Car show registrations
 - `site_images` — CMS for hero/background images (planned)
 
-**Admin Password:** `CraftyKates2026!` (stored in site_settings table, hashed)
+**Admin authentication:** The legacy credential has been removed from documentation. Store credentials outside source control and rotate them through the Netlify environment before use.
 
 **Key Database Columns:**
 - `sponsors.sponsor_type` — Values: `'primary'` | `'carshow'` | `'both'`
@@ -145,7 +145,7 @@ Crafty_Kates/
 
 ## Admin Dashboard
 
-**Login:** `craftykates.com` → Admin login with password `CraftyKates2026!`
+**Login:** `craftykates.com` → Admin login using the current Netlify-managed credential.
 
 **Sections:**
 1. **Image Manager** — Upload/manage site images (partial — doesn't cover all image slots yet)

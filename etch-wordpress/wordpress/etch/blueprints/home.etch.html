@@ -1,0 +1,48 @@
+<main id="main-content">
+  <section class="ck-hero bg--ultra-dark text--light">
+    {#loop ckHeroImage as hero}
+      <etch:img class="ck-hero__media" mediaId="{hero.featured_image_id}" useSrcSet="true" alt="" />
+    {/loop}
+    <div class="ck-hero__shade"></div>
+    <div data-etch-element="container" class="ck-hero__content">
+      <p class="ck-eyebrow">Welcome to Crafty Kates</p>
+      <h1 class="ck-display ck-hero__title">Creativity. Community. <span>Classic Cars.</span></h1>
+      <p>Stories, art, community events, and classic-car culture inspired by Katherine and the people she brings together.</p>
+      <div class="ck-hero__actions"><a class="btn--primary" href="/car-show/">Explore the car show</a><a class="btn--secondary" href="#about">Meet Katherine</a></div>
+    </div>
+  </section>
+
+  <section id="about" data-etch-element="section">
+    <div data-etch-element="container" class="ck-split">
+      <figure class="ck-split__media">{#loop ckAboutPortrait as portrait}<etch:img mediaId="{portrait.featured_image_id}" useSrcSet="true" />{/loop}</figure>
+      <div class="ck-section-intro"><p class="ck-eyebrow">The story behind the name</p><h2 class="ck-display">Meet Katherine</h2><p class="text--dark-muted">Crafty Kates is a place for creativity, meaningful connection, and the classic-car community.</p><a class="btn--primary" href="/posts/">Read community stories</a></div>
+    </div>
+  </section>
+
+  <section data-etch-element="section" class="bg--ultra-light">
+    <div data-etch-element="container"><div class="ck-section-intro ck-section-intro--center"><p class="ck-eyebrow">From the community</p><h2 class="ck-display">Stories worth sharing</h2></div>
+      <div class="grid--auto-3 grid-gap">{#loop ckFeaturedStories as story}<article class="ck-card"><etch:img class="ck-card__media" mediaId="{story.featured_image_id}" useSrcSet="true" /><div class="ck-card__body"><h3 class="ck-display">{story.title}</h3><p>{story.excerpt}</p><a href="{story.permalink.relative}">Read {story.title}</a></div></article>{/loop}</div>
+    </div>
+  </section>
+
+  <section data-etch-element="section">
+    <div data-etch-element="container"><div class="ck-section-intro"><p class="ck-eyebrow">Gather with us</p><h2 class="ck-display">Upcoming events</h2></div>
+      <div class="grid--auto-2 grid-gap">{#loop ckUpcomingEvents as event}<article class="ck-card ck-event-card"><etch:img class="ck-card__media" mediaId="{event.featured_image_id}" useSrcSet="true" /><div><p class="ck-eyebrow">{event.category}</p><h3 class="ck-display">{event.title}</h3><p>{event.event_date} · {event.location}</p><a href="{event.permalink.relative}">Event details</a></div></article>{/loop}</div>
+    </div>
+  </section>
+
+  <section data-etch-element="section" class="bg--ultra-light">
+    <div data-etch-element="container"><div class="ck-section-intro ck-section-intro--center"><p class="ck-eyebrow">Community art</p><h2 class="ck-display">Coloring books</h2></div>
+      <div class="grid--auto-3 grid-gap">{#loop ckColoringBooks as book}<article class="ck-card"><etch:img class="ck-card__media" mediaId="{book.cover_image}" useSrcSet="true" /><div class="ck-card__body"><h3 class="ck-display">{book.title}</h3><p>By {book.author}</p><a href="{book.permalink.relative}">Open coloring book</a></div></article>{/loop}</div>
+    </div>
+  </section>
+
+  <section data-etch-element="section">
+    <div data-etch-element="container"><div class="ck-section-intro ck-section-intro--center"><p class="ck-eyebrow">Friends who make it possible</p><h2 class="ck-display">Our sponsors</h2></div>
+      <div class="grid--auto-4 grid-gap">{#loop ckSponsors as sponsor}<article class="ck-card ck-sponsor-card" data-tier="{sponsor.tier}"><etch:img mediaId="{sponsor.logo}" useSrcSet="true" /><strong>{sponsor.title}</strong><a href="{sponsor.website_url}">Visit sponsor</a></article>{/loop}</div>
+    </div>
+  </section>
+
+  <section id="contact" data-etch-element="section" class="bg--ultra-light"><div data-etch-element="container" class="ck-form-shell"><div class="ck-section-intro"><p class="ck-eyebrow">Say hello</p><h2 class="ck-display">Contact Crafty Kates</h2></div>[ws_form id="REPLACE_CONTACT_FORM_ID"]</div></section>
+  <section id="newsletter" data-etch-element="section" class="bg--ultra-dark text--light"><div data-etch-element="container" class="ck-form-shell"><h2 class="ck-display">Stay in the loop</h2>[ws_form id="REPLACE_NEWSLETTER_FORM_ID"]</div></section>
+</main>

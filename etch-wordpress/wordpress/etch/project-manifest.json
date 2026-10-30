@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "tested_baseline": {
+    "wordpress": "6.8 or newer",
+    "etch": "1.6.5",
+    "automatic_css": "4.0.1",
+    "acf": "6.8.7",
+    "ws_form_pro": "1.12.6",
+    "ws_form_post_management": "1.6.13"
+  },
+  "stylesheets": ["Crafty Kates"],
+  "components": [
+    "CK Skip Link",
+    "CK Header",
+    "CK Footer",
+    "CK Section Intro",
+    "CK Story Card",
+    "CK Event Card",
+    "CK Sponsor Card",
+    "CK Coloring Book Card",
+    "CK Gallery Card"
+  ],
+  "native_components": ["Basic Nav", "Gallery", "Lightbox", "Carousel", "Dialog"],
+  "templates": [
+    "Global Header",
+    "Global Footer",
+    "Blog Archive",
+    "Blog Single",
+    "Event Archive",
+    "Event Single",
+    "Coloring Book Archive",
+    "Coloring Book Single",
+    "Gallery Single",
+    "Legal Page"
+  ],
+  "pages": ["Home", "Car Show", "Car Show Registration", "Crafty Kates Admin"],
+  "forms": ["Contact", "Newsletter", "Car Show Registration", "Submit Story", "Submit Event", "Submit Coloring Book"]
+}

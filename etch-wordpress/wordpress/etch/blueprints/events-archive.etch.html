@@ -1,0 +1,6 @@
+<main id="main-content">
+  <section data-etch-element="section" class="bg--ultra-dark text--light"><div data-etch-element="container" class="ck-section-intro"><p class="ck-eyebrow">Community calendar</p><h1 class="ck-display">Events</h1><p>Car shows, fundraisers, festivals, meetups, and community gatherings.</p><button class="btn--primary" data-etch-dialog-open="submit-event">Submit an event</button></div></section>
+  <section data-etch-element="section"><div data-etch-element="container" class="grid--auto-2 grid-gap">{#loop ckEventArchive as event}<article class="ck-card ck-event-card"><etch:img class="ck-card__media" mediaId="{event.featured_image_id}" useSrcSet="true" /><div><p class="ck-eyebrow">{event.category}</p><h2 class="ck-display">{event.title}</h2><p>{event.event_date} · {event.location}</p><a href="{event.permalink.relative}" aria-label="View event: {event.title}">Event details</a></div></article>{/loop}</div></section>
+  <!-- Insert an Etch native Dialog named submit-event and place the WS Form shortcode inside it. -->
+  <div id="submit-event" class="ck-form-shell">[ws_form id="REPLACE_EVENT_FORM_ID"]</div>
+</main>
